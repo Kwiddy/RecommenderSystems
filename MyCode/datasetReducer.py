@@ -30,9 +30,21 @@ def refine_review(timeframe):
     return rdf
 
 
+def refine_covid():
+    rdf = dfCovid[dfCovid["business_id"].isin(newDFBusiness["business_id"])]
+    rdf = rdf[rdf['delivery or takeout'].str.contains("TRUE")]
+    return rdf
+
+
+def refine_by_covid():
+    rdf = newDFBusiness[newDFBusiness["business_id"].isin(newDFCovid["business_id"])]
+    return rdf
+
+
 # Load the datasets and remove nan valued rows
 dfBusiness = load_dataset("Datasets/full/yelp_academic_dataset_business.json")
 dfReview = load_dataset("Datasets/full/yelp_academic_dataset_review.json")
+dfCovid = load_dataset("Datasets/covid/yelp_academic_dataset_covid_features.json")
 dfBusiness.dropna(subset=["categories"], inplace=True)
 print(dfReview.columns)
 
@@ -47,8 +59,10 @@ domain = "Sports Bar"
 location = "Toronto"
 startDate = "2019"
 newDFBusiness = refine_business(domain, location)
+newDFCovid = refine_covid()
+newDFBusiness2 = refine_by_covid()
 newDFReview = refine_review(startDate)
-print(newDFReview)
 
-newDFBusiness.to_csv("newDFBusiness.csv")
+newDFBusiness2.to_csv("newDFBusiness.csv")
+newDFCovid.to_csv("newDFCovid.csv")
 newDFReview.to_csv("newDFReview.csv")
