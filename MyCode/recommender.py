@@ -38,7 +38,7 @@ def remove_zeros(user, neighbour):
 def make_comparable(items_row):
     comparable = []
     for item in items_row:
-        if type(item) in [float, int]:
+        if type(item) in [float, int] and math.isnan(item) == False:
             comparable.append(item)
     comparable = comparable[1:]
     # return np.array(comparable)
@@ -55,6 +55,10 @@ def find_neighbours(comparison_df):# target_user):
         row = make_comparable(row)
         new_df.append(row)
         print(row)
+        print(len(row))
+   # print(new_df)
+
+    print(cosine_similarity(new_df))
 
     # print(cosine_similarity(comparison_df))
 
