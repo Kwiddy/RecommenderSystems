@@ -5,9 +5,43 @@ import math
 import scipy
 from sklearn.metrics.pairwise import cosine_similarity
 
-businesses_df = pd.read_csv("newDFBusiness.csv")
-reviews_df = pd.read_csv("newDFReview.csv")
-users_df = pd.read_csv("newDFUser.csv")
+
+def test_funct():
+    print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
+    print("[B] UHkDeBOmSKQCBIi9t8YzJw")
+    print("[C] deB6EXuanGiN1tkSASuh3A")
+
+    valid = False
+    while not valid:
+        choice = input("Input the letter corresponding to an ID: ")
+        if choice.upper() == "A":
+            chosen_id = "2U2tqOCphgOQ-NX8b3P6nw"
+            valid = True
+        elif choice.upper() == "B":
+            chosen_id = "UHkDeBOmSKQCBIi9t8YzJw"
+            valid = True
+        elif choice.upper() == "C":
+            chosen_id = "deB6EXuanGiN1tkSASuh3A"
+            valid = True
+        else:
+            print("INVALID INPUT")
+    return chosen_id
+
+
+def display_results(results):
+    for result in results:
+        output = pd.DataFrame()
+        first = True
+        for item in result:
+            item_id = item[1]
+            result = businesses_df[businesses_df["business_id"] == item_id]
+            result["similarity"] = item[0]
+            if first:
+                output = result
+                first = False
+            else:
+                output = pd.concat([output, result])
+        print(output)
 
 
 def make_comparable(items_row):
@@ -37,60 +71,30 @@ def find_user_rated(user, rdf):
 
 
 def find_neighbours(matrix, reviewed, business_index, return_num):
-    id = reviewed["business_id"][0]
-    for i in range(len(business_index)):
-        if business_index[i] == id:
-            row_loc = i
-            break
+    reviewed_neighbours = []
+    for item in reviewed["business_id"]:
+        reviewed_id = item
+        for i in range(len(business_index)):
+            if business_index[i] == reviewed_id:
+                row_loc = i
+                break
 
-    sims_id = []
-    for i in range(len(matrix[row_loc])):
-        sims_id.append([matrix[row_loc][i], business_index[i]])
+        sims_id = []
+        for i in range(len(matrix[row_loc])):
+            sims_id.append([matrix[row_loc][i], business_index[i]])
 
-    similarities = sorted(sims_id, reverse=True)
+        similarities = sorted(sims_id, reverse=True)
 
-    # Remove self from list of similarities
-    similarities = similarities[1:]
+        # Remove self from list of similarities and choose k most similar neighbours
+        similarities = similarities[1:return_num+1]
+        reviewed_neighbours.append(similarities)
 
-    return similarities[:return_num]
-
-
-def display_results(results):
-    output = pd.DataFrame()
-    first = True
-    for item in results:
-        id = item[1]
-        result = businesses_df[businesses_df["business_id"] == id]
-        result["similarity"] = item[0]
-        if first:
-            output = result
-            first = False
-        else:
-            output = pd.concat([output, result])
-    print(output)
+    return reviewed_neighbours
 
 
-def test_funct():
-    print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
-    print("[B] UHkDeBOmSKQCBIi9t8YzJw")
-    print("[C] deB6EXuanGiN1tkSASuh3A")
-
-    valid = False
-    while not valid:
-        choice = input("Input the letter corresponding to an ID: ")
-        if choice.upper() == "A":
-            chosen_id = "2U2tqOCphgOQ-NX8b3P6nw"
-            valid = True
-        elif choice.upper() == "B":
-            chosen_id = "UHkDeBOmSKQCBIi9t8YzJw"
-            valid = True
-        elif choice.upper() == "C":
-            chosen_id = "deB6EXuanGiN1tkSASuh3A"
-            valid = True
-        else:
-            print("INVALID INPUT")
-    return chosen_id
-
+businesses_df = pd.read_csv("newDFBusiness.csv")
+reviews_df = pd.read_csv("newDFReview.csv")
+users_df = pd.read_csv("newDFUser.csv")
 
 # Eventually this should be changeable, this is just for testing purposes
 i_user_id = "2U2tqOCphgOQ-NX8b3P6nw"
