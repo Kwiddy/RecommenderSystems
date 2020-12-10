@@ -70,8 +70,32 @@ def display_results(results):
     print(output)
 
 
+def test_funct():
+    print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
+    print("[B] UHkDeBOmSKQCBIi9t8YzJw")
+    print("[C] deB6EXuanGiN1tkSASuh3A")
+
+    valid = False
+    while not valid:
+        choice = input("Input the letter corresponding to an ID: ")
+        if choice.upper() == "A":
+            chosen_id = "2U2tqOCphgOQ-NX8b3P6nw"
+            valid = True
+        elif choice.upper() == "B":
+            chosen_id = "UHkDeBOmSKQCBIi9t8YzJw"
+            valid = True
+        elif choice.upper() == "C":
+            chosen_id = "deB6EXuanGiN1tkSASuh3A"
+            valid = True
+        else:
+            print("INVALID INPUT")
+    return chosen_id
+
+
 # Eventually this should be changeable, this is just for testing purposes
 i_user_id = "2U2tqOCphgOQ-NX8b3P6nw"
+
+i_user_id = test_funct()
 
 # find the similarity matrix between all businesses and store locations for later use
 similarity_matrix, indices = find_similarities(businesses_df)
