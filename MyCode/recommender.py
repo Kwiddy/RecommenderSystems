@@ -111,3 +111,41 @@ rated_items = find_user_rated(i_user_id, reviews_df)
 neighbours = find_neighbours(similarity_matrix, rated_items, indices, 12)
 
 display_results(neighbours)
+
+# when comparing each new item to recommend, it should be similarity to all previously rated items (weighted Avg [regression]?) and not just each one individually
+# You only find similarity between two items that the user has rated?
+
+
+
+
+
+
+
+
+
+
+
+############################################
+
+
+# def my_cosine(rated_id, compared_business_id):
+#     # Find Extracted co-rated pairs
+#     reviews_of_rated = reviews_df[reviews_df["business_id"] == rated_id]
+#     reviews_of_compared = reviews_df[reviews_df["business_id"] == compared_business_id]
+#
+#     rdf1 = reviews_of_rated[reviews_of_rated["user_id"].isin(reviews_of_compared["user_id"])]
+#     rdf2 = reviews_of_compared[reviews_of_compared["user_id"].isin(reviews_of_rated["user_id"])]
+#
+#     scores = []
+#
+#     if len(rdf1) != 0:
+#         scores.append(int(rdf1["stars"]))
+#         scores.append(int(rdf2["stars"]))
+#         dot = np.dot(scores[0], scores[1])
+#         ans = dot / (scores[0] * scores[1])
+#         print(str(rated_id) + " : " + str(compared_business_id) + " : " + str(ans))
+#
+#
+# for i in range(len(businesses_df)):
+#     if businesses_df["business_id"][i] != "28adZ4lsuUeVB2aWzohK9g":
+#         my_cosine("28adZ4lsuUeVB2aWzohK9g", businesses_df["business_id"][i])
