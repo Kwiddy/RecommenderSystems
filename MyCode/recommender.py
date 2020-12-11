@@ -29,19 +29,18 @@ def test_funct():
 
 
 def display_results(results):
-    for result in results:
-        output = pd.DataFrame()
-        first = True
-        for item in result:
-            item_id = item[1]
-            result = businesses_df[businesses_df["business_id"] == item_id]
-            result["similarity"] = item[0]
-            if first:
-                output = result
-                first = False
-            else:
-                output = pd.concat([output, result])
-        print(output)
+    output = pd.DataFrame()
+    first = True
+    for item in results:
+        item_id = item[1]
+        result = businesses_df[businesses_df["business_id"] == item_id]
+        result["Prediction"] = item[0]
+        if first:
+            output = result
+            first = False
+        else:
+            output = pd.concat([output, result])
+    print(output)
 
 
 def make_comparable(items_row):
@@ -70,26 +69,82 @@ def find_user_rated(user, rdf):
     return user_reviews
 
 
-def find_neighbours(matrix, reviewed, business_index, return_num):
-    reviewed_neighbours = []
-    for item in reviewed["business_id"]:
+def find_predictions(matrix, user, rated, business_index, return_num):
+    # Find the location of the reviewed items in the similarity matrix
+    n_final_similarities = []
+    d_final_similarities = []
+    reviewed_stars = []
+    for item in rated["business_id"]:
+
         reviewed_id = item
+        rated_item = rated.loc[rated["business_id"] == reviewed_id]
+        reviewed_stars.append(int(rated_item["stars"]))
+
         for i in range(len(business_index)):
             if business_index[i] == reviewed_id:
                 row_loc = i
                 break
 
+        # Find all items (to predict) which have a similarity to the reviewed item
         sims_id = []
         for i in range(len(matrix[row_loc])):
-            sims_id.append([matrix[row_loc][i], business_index[i]])
+            if i != row_loc:
+                sims_id.append([matrix[row_loc][i], business_index[i]])
 
-        similarities = sorted(sims_id, reverse=True)
+        # Append similarities to a list of all similarity scores for each reviewed item
+        n_final_similarities.append(sims_id)
+        d_final_similarities.append(sims_id)
 
-        # Remove self from list of similarities and choose k most similar neighbours
-        similarities = similarities[1:return_num+1]
-        reviewed_neighbours.append(similarities)
+    # reviewed_item = item in reviewed
+    # reviewed_stars = user rating
+    # (n|d)_final_similarities = matrix of matrices of similarities for items being predicted
 
-    return reviewed_neighbours
+    temp = []
+    for i in range(len(n_final_similarities)):
+        multiplier = reviewed_stars[i]
+        temp2 = []
+        for j in range(len(n_final_similarities[i])):
+            product = multiplier * n_final_similarities[i][j][0]
+            new_item = [product, n_final_similarities[i][j][1]]
+            temp2.append(new_item)
+        temp.append(temp2)
+    n_final_similarities = temp
+
+    # numerator = SUM(multiply user's rating by the similarity score between item being predicted and each item in reviewed)
+    numerators = []
+
+    for j in range(len(n_final_similarities[0])):
+        sum_total = 0
+        predict_id = n_final_similarities[0][j][1]
+        for i in range(len(n_final_similarities)):
+            sum_total += n_final_similarities[i][j][0]
+        numerators.append([sum_total, predict_id])
+
+    # denominator = SUM(ABS(each similarity between the item being predicted and each item in reviewed))
+    denominators = []
+
+    for j in range(len(d_final_similarities[0])):
+        sum_total = 0
+        predict_id = d_final_similarities[0][j][1]
+        for i in range(len(d_final_similarities)):
+            sum_total += abs(d_final_similarities[i][j][0])
+        denominators.append([sum_total, predict_id])
+
+    # Create the predictions for each item by dividing the numerator elements by the corresponding denominator elements
+    predictions = []
+    for i in range(len(numerators)):
+        n = numerators[i][0]
+        d = denominators[i][0]
+        result = n/d
+        predictions.append([result, numerators[i][1]])
+
+    # Sort the predictions
+    sorted_predictions = sorted(predictions, reverse=True)
+
+    # Only return the top n predictions
+    sorted_predictions = sorted_predictions[:return_num]
+
+    return sorted_predictions
 
 
 businesses_df = pd.read_csv("newDFBusiness.csv")
@@ -107,45 +162,8 @@ similarity_matrix, indices = find_similarities(businesses_df)
 # Find all businesses reviewed by the user
 rated_items = find_user_rated(i_user_id, reviews_df)
 
-# Find similar businesses to those which have been reviewed by user
-neighbours = find_neighbours(similarity_matrix, rated_items, indices, 12)
 
-display_results(neighbours)
+# Find the predictions for each item and so find those items to be recommended
+weighted_average = find_predictions(similarity_matrix, i_user_id, rated_items, indices, 12)
 
-# when comparing each new item to recommend, it should be similarity to all previously rated items (weighted Avg [regression]?) and not just each one individually
-# You only find similarity between two items that the user has rated?
-
-
-
-
-
-
-
-
-
-
-
-############################################
-
-
-# def my_cosine(rated_id, compared_business_id):
-#     # Find Extracted co-rated pairs
-#     reviews_of_rated = reviews_df[reviews_df["business_id"] == rated_id]
-#     reviews_of_compared = reviews_df[reviews_df["business_id"] == compared_business_id]
-#
-#     rdf1 = reviews_of_rated[reviews_of_rated["user_id"].isin(reviews_of_compared["user_id"])]
-#     rdf2 = reviews_of_compared[reviews_of_compared["user_id"].isin(reviews_of_rated["user_id"])]
-#
-#     scores = []
-#
-#     if len(rdf1) != 0:
-#         scores.append(int(rdf1["stars"]))
-#         scores.append(int(rdf2["stars"]))
-#         dot = np.dot(scores[0], scores[1])
-#         ans = dot / (scores[0] * scores[1])
-#         print(str(rated_id) + " : " + str(compared_business_id) + " : " + str(ans))
-#
-#
-# for i in range(len(businesses_df)):
-#     if businesses_df["business_id"][i] != "28adZ4lsuUeVB2aWzohK9g":
-#         my_cosine("28adZ4lsuUeVB2aWzohK9g", businesses_df["business_id"][i])
+display_results(weighted_average)
