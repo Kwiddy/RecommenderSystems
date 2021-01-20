@@ -33,12 +33,16 @@ def select_user(user_df):
     elif input_own_choice.upper() == "N":
         valid_input = False
         while not valid_input:
-            chosen_id = input("Please enter user ID: ")
-            user_reviews = user_df[user_df["user_id"] == chosen_id]
-            if len(user_reviews) > 0:
+            chosen_id = input("Please enter user ID (or enter [S] to return): ")
+            if chosen_id.upper() == "S":
                 valid_input = True
+                select_user(user_df)
             else:
-                print("INVALID INPUT - Sorry, it looks like we don't have any users with this ID")
+                user_reviews = user_df[user_df["user_id"] == chosen_id]
+                if len(user_reviews) > 0:
+                    valid_input = True
+                else:
+                    print("INVALID INPUT - Sorry, it looks like we don't have any users with this ID")
         return chosen_id
 
 
@@ -81,6 +85,29 @@ def find_similarities(comparison_df):
 def find_user_rated(user, rdf):
     user_reviews = rdf[rdf["user_id"] == user]
     return user_reviews
+
+
+def anything_else(user_id):
+    print("Please choose one of the options below: ")
+    print("[M] - Continue")
+    print("[L] - Logout and enter another user ID")
+    print("[X] - Close the program")
+    valid = False
+    while not valid:
+        choice = input("Choice: ")
+
+        if choice.upper() == "X":
+            valid = True
+            exit()
+        elif choice.upper() == "L":
+            valid = True
+            main(True, "")
+        elif choice.upper() == "M":
+            valid = True
+            main(False, user_id)
+        else:
+            print("INVALID CHOICE")
+
 
 
 def find_predictions(matrix, user, rated, business_index, return_num):
@@ -161,22 +188,47 @@ def find_predictions(matrix, user, rated, business_index, return_num):
     return sorted_predictions
 
 
+def generate_recommendations(user_id):
+    # find the similarity matrix between all businesses and store locations for later use
+    similarity_matrix, indices = find_similarities(businesses_df)
+
+    # Find all businesses reviewed by the user
+    rated_items = find_user_rated(user_id, reviews_df)
+
+    # Find the predictions for each item and find the items to be recommended
+    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, 12)
+
+    display_results(weighted_average)
+
+
+def main(new_user, existing_user):
+    if new_user:
+        i_user_id = select_user(users_df)
+    else:
+        i_user_id = existing_user
+
+    # Allow user to choose their service
+    print("[R] - Generate list of recommendations")
+    print("[N] - Add a new review")
+    print("[E] - Update an existing review")
+    print("[P] - Update user preferences")
+
+    valid_choice = False
+    while not valid_choice:
+        choice = input("Please choose from the services listed above: ")
+
+        if choice.upper() == "R":
+            valid_choice = True
+            generate_recommendations(i_user_id)
+        else:
+            print("INVALID CHOICE - Please select from the list provided")
+
+
+    anything_else(i_user_id)
+
+
 businesses_df = pd.read_csv("newDFBusiness.csv")
 reviews_df = pd.read_csv("newDFReview.csv")
 users_df = pd.read_csv("newDFUser.csv")
 
-# Eventually this should be changeable, this is just for testing purposes
-i_user_id = "2U2tqOCphgOQ-NX8b3P6nw"
-
-i_user_id = select_user(users_df)
-
-# find the similarity matrix between all businesses and store locations for later use
-similarity_matrix, indices = find_similarities(businesses_df)
-
-# Find all businesses reviewed by the user
-rated_items = find_user_rated(i_user_id, reviews_df)
-
-# Find the predictions for each item and find the items to be recommended
-weighted_average = find_predictions(similarity_matrix, i_user_id, rated_items, indices, 12)
-
-display_results(weighted_average)
+main(True, "")
