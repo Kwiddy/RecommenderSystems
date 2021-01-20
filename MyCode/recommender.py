@@ -13,7 +13,6 @@ def select_user(user_df):
         print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
         print("[B] UHkDeBOmSKQCBIi9t8YzJw")
         print("[C] deB6EXuanGiN1tkSASuh3A")
-        print()
         print("[X] - Exit")
 
         valid = False
@@ -59,7 +58,7 @@ def display_results(results):
     first = True
     for item in results:
         item_id = item[1]
-        result = businesses_df[businesses_df["business_id"] == item_id]
+        result = businesses_df.loc[businesses_df["business_id"] == item_id].copy()
         result["Prediction"] = item[0]
         if first:
             output = result
@@ -109,9 +108,11 @@ def anything_else(user_id):
             exit()
         elif choice.upper() == "L":
             valid = True
+            print()
             main(True, user_id)
         elif choice.upper() == "M":
             valid = True
+            print()
             main(False, user_id)
         elif choice.upper() == "EXIT":
             exit()
@@ -231,6 +232,7 @@ def main(new_user, existing_user):
 
         if choice.upper() == "R":
             valid_choice = True
+            print()
             generate_recommendations(i_user_id)
         elif choice.upper() == "X":
             exit()
