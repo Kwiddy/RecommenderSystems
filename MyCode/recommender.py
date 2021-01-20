@@ -6,26 +6,40 @@ import scipy
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-def test_funct():
-    print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
-    print("[B] UHkDeBOmSKQCBIi9t8YzJw")
-    print("[C] deB6EXuanGiN1tkSASuh3A")
+def select_user(user_df):
+    input_own_choice = input("Please enter [N] for inputting a chosen user id, or [S] to select from pre-chosen IDs: ")
 
-    valid = False
-    while not valid:
-        choice = input("Input the letter corresponding to an ID: ")
-        if choice.upper() == "A":
-            chosen_id = "2U2tqOCphgOQ-NX8b3P6nw"
-            valid = True
-        elif choice.upper() == "B":
-            chosen_id = "UHkDeBOmSKQCBIi9t8YzJw"
-            valid = True
-        elif choice.upper() == "C":
-            chosen_id = "deB6EXuanGiN1tkSASuh3A"
-            valid = True
-        else:
-            print("INVALID INPUT")
-    return chosen_id
+    if input_own_choice.upper() == "S":
+        print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
+        print("[B] UHkDeBOmSKQCBIi9t8YzJw")
+        print("[C] deB6EXuanGiN1tkSASuh3A")
+
+        valid = False
+        while not valid:
+            choice = input("Input the letter corresponding to an ID: ")
+            if choice.upper() == "A":
+                chosen_id = "2U2tqOCphgOQ-NX8b3P6nw"
+                valid = True
+            elif choice.upper() == "B":
+                chosen_id = "UHkDeBOmSKQCBIi9t8YzJw"
+                valid = True
+            elif choice.upper() == "C":
+                chosen_id = "deB6EXuanGiN1tkSASuh3A"
+                valid = True
+            else:
+                print("INVALID INPUT")
+        return chosen_id
+
+    elif input_own_choice.upper() == "N":
+        valid_input = False
+        while not valid_input:
+            chosen_id = input("Please enter user ID: ")
+            user_reviews = user_df[user_df["user_id"] == chosen_id]
+            if len(user_reviews) > 0:
+                valid_input = True
+            else:
+                print("INVALID INPUT - Sorry, it looks like we don't have any users with this ID")
+        return chosen_id
 
 
 def display_results(results):
@@ -154,7 +168,7 @@ users_df = pd.read_csv("newDFUser.csv")
 # Eventually this should be changeable, this is just for testing purposes
 i_user_id = "2U2tqOCphgOQ-NX8b3P6nw"
 
-i_user_id = test_funct()
+i_user_id = select_user(users_df)
 
 # find the similarity matrix between all businesses and store locations for later use
 similarity_matrix, indices = find_similarities(businesses_df)
@@ -162,8 +176,7 @@ similarity_matrix, indices = find_similarities(businesses_df)
 # Find all businesses reviewed by the user
 rated_items = find_user_rated(i_user_id, reviews_df)
 
-
-# Find the predictions for each item and so find those items to be recommended
+# Find the predictions for each item and find the items to be recommended
 weighted_average = find_predictions(similarity_matrix, i_user_id, rated_items, indices, 12)
 
 display_results(weighted_average)
