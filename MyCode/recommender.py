@@ -13,6 +13,8 @@ def select_user(user_df):
         print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
         print("[B] UHkDeBOmSKQCBIi9t8YzJw")
         print("[C] deB6EXuanGiN1tkSASuh3A")
+        print()
+        print("[X] - Exit")
 
         valid = False
         while not valid:
@@ -26,23 +28,29 @@ def select_user(user_df):
             elif choice.upper() == "C":
                 chosen_id = "deB6EXuanGiN1tkSASuh3A"
                 valid = True
+            elif choice.upper() == "X":
+                exit()
             else:
                 print("INVALID INPUT")
+        print()
         return chosen_id
 
     elif input_own_choice.upper() == "N":
         valid_input = False
         while not valid_input:
-            chosen_id = input("Please enter user ID (or enter [S] to return): ")
+            chosen_id = input("Please enter user ID (or enter [S] to return / [X] to exit): ")
             if chosen_id.upper() == "S":
                 valid_input = True
-                select_user(user_df)
+                chosen_id = select_user(user_df)
+            elif chosen_id.upper == "X":
+                exit()
             else:
                 user_reviews = user_df[user_df["user_id"] == chosen_id]
                 if len(user_reviews) > 0:
                     valid_input = True
                 else:
                     print("INVALID INPUT - Sorry, it looks like we don't have any users with this ID")
+        print()
         return chosen_id
 
 
@@ -101,12 +109,15 @@ def anything_else(user_id):
             exit()
         elif choice.upper() == "L":
             valid = True
-            main(True, "")
+            main(True, user_id)
         elif choice.upper() == "M":
             valid = True
             main(False, user_id)
+        elif choice.upper() == "EXIT":
+            exit()
         else:
             print("INVALID CHOICE")
+    print()
 
 
 
@@ -212,6 +223,7 @@ def main(new_user, existing_user):
     print("[N] - Add a new review")
     print("[E] - Update an existing review")
     print("[P] - Update user preferences")
+    print("[X] - Exit")
 
     valid_choice = False
     while not valid_choice:
@@ -220,9 +232,10 @@ def main(new_user, existing_user):
         if choice.upper() == "R":
             valid_choice = True
             generate_recommendations(i_user_id)
+        elif choice.upper() == "X":
+            exit()
         else:
             print("INVALID CHOICE - Please select from the list provided")
-
 
     anything_else(i_user_id)
 
