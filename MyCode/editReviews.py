@@ -1,10 +1,12 @@
 import string
 import random
 import datetime
+import pandas as pd
 
 
 def edit_reviews(user_id, businesses, reviews, users):
     # Display current reviews
+    reviews = pd.read_csv("newDFReview.csv")
     display_reviews(user_id, reviews)
 
     # Give the option to Add, Amend, Delete
@@ -70,9 +72,11 @@ def add_new_review(user_id, reviews, businesses):
         name_search = businesses[businesses["name"] == review_business_input]
         if len(id_search) != 0:
             review_business_id = id_search['business_id'].iloc[0]
+            print("Chosen Business: ", str(id_search['name'].iloc[0]))
             valid_input = True
         elif len(name_search) != 0:
             review_business_id = name_search['business_id'].iloc[0]
+            print("Chosen Business: ", str(name_search['name'].iloc[0]))
             valid_input = True
         else:
             print("INVALID NAME OR BUSINESS")
@@ -94,9 +98,11 @@ def add_new_review(user_id, reviews, businesses):
     # Generate date
     review_time = str(datetime.datetime.now())[:-7]
 
-
-    # Update newDFReview.csv: take user,bus,rev id, take stars, text, and date, add (set other vals to initially zero?)
-    print(reviews.tail(3))
+    # update reviews dataframe
+    new_review = {'review_id': review_id, 'user_id': user_id, 'business_id': review_business_id, 'stars': review_stars,
+                  'useful': 0, 'funny': 0, 'cool': 0, 'text': review_text, 'date': review_time}
+    reviews = reviews.append(new_review, ignore_index=True)
+    reviews.to_csv("newDFReview.csv", index=0)
 
     # Update newDFBusiness.csv: update review count, do I need to update stars?
     print("hi")

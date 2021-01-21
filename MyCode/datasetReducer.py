@@ -27,6 +27,8 @@ def refine_business(category, city):
 def refine_review(timeframe):
     tempdf = dfReview[dfReview['date'].str.contains(timeframe)]
     rdf = tempdf[tempdf["business_id"].isin(newDFBusiness["business_id"])]
+    # rdf = rdf.drop(rdf.columns[[0]], axis=1)
+    # print(rdf)
     return rdf
 
 
@@ -52,7 +54,7 @@ dfReview = load_dataset("Datasets/full/yelp_academic_dataset_review.json")
 dfCovid = load_dataset("Datasets/covid/yelp_academic_dataset_covid_features.json")
 dfUsers = load_dataset("Datasets/full/yelp_academic_dataset_user.json")
 dfBusiness.dropna(subset=["categories"], inplace=True)
-print(dfReview.columns)
+# print(dfReview.columns)
 
 # Create new dataset with specific category
 # Number of items for several categories (all cities):
@@ -76,5 +78,5 @@ print("refined users")
 
 newDFBusiness2.to_csv("newDFBusiness.csv")
 newDFCovid.to_csv("newDFCovid.csv")
-newDFReview.to_csv("newDFReview.csv")
+newDFReview.to_csv("newDFReview.csv", index=0)
 newDFUser.to_csv("newDFUser.csv")
