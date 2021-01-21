@@ -117,8 +117,67 @@ def add_new_review(user_id, reviews, businesses, users):
     print()
 
 
-# def delete_review(user_id, reviews, businesses, users):
+def delete_review(user_id, reviews, businesses, users):
+    print()
+    print("[S] - Select one review to delete")
+    print("[A] - Delete all of my reviews")
+    valid_choice = False
+    while not valid_choice:
+        choice = input("Please select from the options above: ")
+        if choice.upper() == "S":
+            valid_choice = True
+            display_reviews(user_id, reviews)
+            valid_choice_2 = False
+            while not valid_choice_2:
+                chosen_id = input("Please enter ID of review to be deleted: ")
+                id_search = reviews[reviews["review_id"] == chosen_id]
+                business_id = id_search['business_id'].iloc[0]
+                if len(id_search) == 0:
+                    print("INVALID ID")
+                else:
+                    valid_choice_2 = True
 
+                    temp = reviews[reviews.review_id == chosen_id]
+                    users['average_stars'] = np.where(users['user_id'] == user_id, round(
+                        ((users['average_stars'] * users["review_count"]) - int(temp["stars"])) / (
+                                    users["review_count"] - 1), 2), users['average_stars'])
+                    temp = []
+
+                    reviews = reviews[reviews.review_id != chosen_id]
+                    businesses.loc[businesses["business_id"] == business_id, "review_count"] -= 1
+                    businesses.to_csv("newDFBusiness.csv", index=0)
+                    users.loc[users["user_id"] == user_id, "review_count"] -= 1
+                    users.to_csv("newDFUser.csv", index=0)
+        elif choice.upper() == "A":
+            sure_valid = False
+            valid_choice = True
+            while not sure_valid:
+                yn = input("Are you sure? [Y/N]: ")
+                if yn.upper() == "Y":
+                    sure_valid = True
+                    temp = reviews[reviews.user_id == user_id]
+                    for index, row in temp.iterrows():
+
+                        users['average_stars'] = np.where(users['user_id'] == user_id, round(
+                            ((users['average_stars'] * users["review_count"]) - int(row["stars"])) / (
+                                    users["review_count"] - 1), 2), users['average_stars'])
+
+                        businesses.loc[businesses["business_id"] == row['business_id'], "review_count"] -= 1
+                        businesses.to_csv("newDFBusiness.csv", index=0)
+                        users.loc[users["user_id"] == user_id, "review_count"] -= 1
+                        users.to_csv("newDFUser.csv", index=0)
+                    reviews = reviews[reviews.user_id != user_id]
+                    temp = []
+                elif yn.upper() == "N":
+                    sure_valid = True
+                else:
+                    print("INVALID INPUT")
+        else:
+            print("INVALID INPUT")
+    reviews.to_csv("newDFReview.csv", index=0)
+    print()
+
+    ## To do: average stars
 
 def gen_new_review_id(reviews):
     alphabet = list(string.ascii_letters) + ["_", "-"]
