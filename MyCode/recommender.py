@@ -3,50 +3,56 @@ from generateRecommendatations import *
 
 
 def select_user(user_df):
-    input_own_choice = input("Please enter [N] for inputting a chosen user id, or [S] to select from pre-chosen IDs: ")
+    valid_choice = False
+    while not valid_choice:
+        input_own_choice = input("Please enter [N] for inputting a chosen user id, or [S] to select from pre-chosen IDs: ")
 
-    if input_own_choice.upper() == "S":
-        print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
-        print("[B] UHkDeBOmSKQCBIi9t8YzJw")
-        print("[C] deB6EXuanGiN1tkSASuh3A")
-        print("[X] - Exit")
+        if input_own_choice.upper() == "S":
+            valid_choice = True
+            print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
+            print("[B] UHkDeBOmSKQCBIi9t8YzJw")
+            print("[C] deB6EXuanGiN1tkSASuh3A")
+            print("[X] - Exit")
 
-        valid = False
-        while not valid:
-            choice = input("Input the letter corresponding to an ID: ")
-            if choice.upper() == "A":
-                chosen_id = "2U2tqOCphgOQ-NX8b3P6nw"
-                valid = True
-            elif choice.upper() == "B":
-                chosen_id = "UHkDeBOmSKQCBIi9t8YzJw"
-                valid = True
-            elif choice.upper() == "C":
-                chosen_id = "deB6EXuanGiN1tkSASuh3A"
-                valid = True
-            elif choice.upper() == "X":
-                exit()
-            else:
-                print("INVALID INPUT")
-        print()
-        return chosen_id
-
-    elif input_own_choice.upper() == "N":
-        valid_input = False
-        while not valid_input:
-            chosen_id = input("Please enter user ID (or enter [S] to return / [X] to exit): ")
-            if chosen_id.upper() == "S":
-                valid_input = True
-                chosen_id = select_user(user_df)
-            elif chosen_id.upper() == "X":
-                exit()
-            else:
-                user_reviews = user_df[user_df["user_id"] == chosen_id]
-                if len(user_reviews) > 0:
-                    valid_input = True
+            valid = False
+            while not valid:
+                choice = input("Input the letter corresponding to an ID: ")
+                if choice.upper() == "A":
+                    chosen_id = "2U2tqOCphgOQ-NX8b3P6nw"
+                    valid = True
+                elif choice.upper() == "B":
+                    chosen_id = "UHkDeBOmSKQCBIi9t8YzJw"
+                    valid = True
+                elif choice.upper() == "C":
+                    chosen_id = "deB6EXuanGiN1tkSASuh3A"
+                    valid = True
+                elif choice.upper() == "X":
+                    exit()
                 else:
-                    print("INVALID INPUT - Sorry, it looks like we don't have any users with this ID")
-        print()
-        return chosen_id
+                    print("INVALID INPUT")
+            print()
+            return chosen_id
+
+        elif input_own_choice.upper() == "N":
+            valid_input = False
+            valid_choice = True
+            while not valid_input:
+                chosen_id = input("Please enter user ID (or enter [S] to return / [X] to exit): ")
+                if chosen_id.upper() == "S":
+                    valid_input = True
+                    chosen_id = select_user(user_df)
+                elif chosen_id.upper() == "X":
+                    exit()
+                else:
+                    user_reviews = user_df[user_df["user_id"] == chosen_id]
+                    if len(user_reviews) > 0:
+                        valid_input = True
+                    else:
+                        print("INVALID INPUT - Sorry, it looks like we don't have any users with this ID")
+            print()
+            return chosen_id
+        else:
+            print("INVALID INPUT")
 
 
 def anything_else(user_id):
