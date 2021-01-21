@@ -2,6 +2,7 @@ import string
 import random
 import datetime
 import pandas as pd
+import numpy as np
 
 
 def edit_reviews(user_id, businesses, reviews, users):
@@ -21,7 +22,7 @@ def edit_reviews(user_id, businesses, reviews, users):
 
         if choice.upper() == "N":
             valid_choice = True
-            add_new_review(user_id, reviews, businesses)
+            add_new_review(user_id, reviews, businesses, users)
             anything_else(user_id, businesses, reviews, users)
 
         elif choice.upper() == "A":
@@ -32,8 +33,7 @@ def edit_reviews(user_id, businesses, reviews, users):
 
         elif choice.upper() == "D":
             valid_choice = True
-            print("delete")
-            # function to delete existing review
+            delete_review(user_id, reviews, businesses, users)
             anything_else(user_id, businesses, reviews, users)
 
         elif choice.upper() == "B":
@@ -48,7 +48,7 @@ def edit_reviews(user_id, businesses, reviews, users):
             print("INVALID INPUT")
 
 
-def add_new_review(user_id, reviews, businesses):
+def add_new_review(user_id, reviews, businesses, users):
     # Dummy function to generate a new review_id
     # Due to only being able to submit a subset of the yelp data and this recommender only focusing on said subset
     #   I simply create a new random review ID that hasn't been seen before from the existing IDs in the subset
@@ -104,17 +104,20 @@ def add_new_review(user_id, reviews, businesses):
     reviews = reviews.append(new_review, ignore_index=True)
     reviews.to_csv("newDFReview.csv", index=0)
 
-    # Update newDFBusiness.csv: update review count, do I need to update stars?
-    print("hi")
+    # update review count, do I need to update stars?
+    businesses.loc[businesses["business_id"] == review_business_input, "review_count"] += 1
+    businesses.to_csv("newDFBusiness.csv", index=0)
 
-    # Update newDFUser.csv: update review count, update average stars,
-    print("hi")
-
-    # Update newDFCheckin.csv update checkin
-    print("hi")
+    # Edit user's number of reviews and average stars
+    users['average_stars'] = np.where(users['user_id'] == user_id, round(((users['average_stars']*users["review_count"])+int(review_stars[:-2]))/(users["review_count"]+1), 2), users['average_stars'])
+    users.loc[users["user_id"] == user_id, "review_count"] += 1
+    users.to_csv("newDFUser.csv", index=0)
 
     print("Review created with id: ", review_id)
     print()
+
+
+# def delete_review(user_id, reviews, businesses, users):
 
 
 def gen_new_review_id(reviews):
@@ -132,7 +135,6 @@ def gen_new_review_id(reviews):
             valid_selection = True
 
     return generated_id
-
 
 
 def anything_else(user_id, businesses, reviews, users):
