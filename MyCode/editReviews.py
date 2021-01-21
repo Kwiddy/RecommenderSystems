@@ -11,36 +11,42 @@ def edit_reviews(user_id, businesses, reviews, users):
     valid_choice = False
     while not valid_choice:
         choice = input("Please enter from the selection above: ")
+
         if choice.upper() == "N":
             valid_choice = True
-            print("add")
-            #
+            add_new_review(user_id)
             anything_else(user_id, businesses, reviews, users)
+
         elif choice.upper() == "A":
             valid_choice = True
             print("Amend")
-            #
+            # function to amend existing review
             anything_else(user_id, businesses, reviews, users)
+
         elif choice.upper() == "D":
             valid_choice = True
             print("delete")
-            #
+            # function to delete existing review
             anything_else(user_id, businesses, reviews, users)
+
         elif choice.upper() == "B":
             valid_choice = True
             print()
-            #
+
         elif choice.upper() == "X":
             valid_choice = True
             exit()
+
         else:
             print("INVALID INPUT")
 
-    # Add a new review
 
-    # Delete an existing review
-
-    # Amend an existing review
+def add_new_review():
+    # Update newDFReview.csv: generate new review id, take user id and business id, take stars, text, and date, add (set other vals to initially zero?)
+    # Update newDFBusiness.csv: update review count, do I need to update stars?
+    # Update newDFUser.csv: update review count, update average stars,
+    # Update newDFCheckin.csv update checkin
+    print("HI")
 
 
 def anything_else(user_id, businesses, reviews, users):
