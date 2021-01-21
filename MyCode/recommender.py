@@ -1,4 +1,4 @@
-from addReview import *
+from editReviews import *
 from generateRecommendatations import *
 
 
@@ -50,13 +50,12 @@ def select_user(user_df):
 
 
 def anything_else(user_id):
-    print("Please choose one of the options below: ")
     print("[M] - Continue")
     print("[L] - Logout and enter another user ID")
     print("[X] - Close the program")
     valid = False
     while not valid:
-        choice = input("Choice: ")
+        choice = input("Please choose one of the options above: ")
 
         if choice.upper() == "X":
             valid = True
@@ -99,7 +98,7 @@ def main(new_user, existing_user):
         elif choice.upper() == "R":
             valid_choice = True
             print()
-            add_new_review(i_user_id, businesses_df, reviews_df, users_df)
+            edit_reviews(i_user_id, businesses_df, reviews_df, users_df)
         elif choice.upper() == "X":
             exit()
         else:
