@@ -50,6 +50,9 @@ def refine_users():
 
     # Add a column for preferred number of recommendations to display (default 12)
     rdf = rdf.assign(display_num=12)
+
+    # Add a column for blacklisted businesses
+    rdf["blacklist"] = ""
     return rdf
 
 

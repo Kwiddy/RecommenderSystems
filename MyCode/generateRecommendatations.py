@@ -10,8 +10,15 @@ def generate_recommendations(user_id, businesses_df, reviews_df, users_df):
     # Find all businesses reviewed by the user
     rated_items = find_user_rated(user_id, reviews_df)
 
+    # Find blacklisted items
+    id_search = users_df[users_df["user_id"] == user_id]
+    blacklist_str = id_search['blacklist'].iloc[0]
+    blacklist = []
+    if not pd.isna(blacklist_str):
+        blacklist = blacklist_str.split(",")
+
     # Find the predictions for each item and find the items to be recommended
-    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices)
+    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, blacklist)
 
     #   To display is the users preference for the number of results to show
     id_search = users_df[users_df["user_id"] == user_id]
@@ -45,7 +52,7 @@ def make_comparable(items_row):
     return comparable[1:]
 
 
-def find_predictions(matrix, user, rated, business_index):
+def find_predictions(matrix, user, rated, business_index, blacklist):
     # Find the location of the reviewed items in the similarity matrix
     n_final_similarities = []
     d_final_similarities = []
@@ -117,8 +124,10 @@ def find_predictions(matrix, user, rated, business_index):
     # Sort the predictions
     sorted_predictions = sorted(predictions, reverse=True)
 
-    # Only return the top n predictions
-    sorted_predictions = sorted_predictions
+    # remove blacklisted items
+    for item in sorted_predictions:
+        if item[1] in blacklist:
+            sorted_predictions.remove(item)
 
     return sorted_predictions
 

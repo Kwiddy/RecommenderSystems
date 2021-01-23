@@ -92,6 +92,7 @@ def main(new_user, existing_user):
     print("[G] - Generate list of recommendations")
     print("[R] - Add/Amend/View/Delete a Review")
     print("[P] - Update user preferences")
+    print("[L] - Logout and enter another User ID")
     print("[X] - Exit")
 
     valid_choice = False
@@ -109,7 +110,11 @@ def main(new_user, existing_user):
         elif choice.upper() == "P":
             valid_choice = True
             print()
-            update_preferences(i_user_id, users_df)
+            update_preferences(i_user_id, users_df, businesses_df)
+        elif choice.upper() == "L":
+            valid_choice= True
+            print()
+            main(True, i_user_id)
         elif choice.upper() == "X":
             exit()
         else:
