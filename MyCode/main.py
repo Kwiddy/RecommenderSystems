@@ -1,3 +1,4 @@
+import datetime
 from editReviews import *
 from updatePreferences import *
 from generateRecommendatations import *
@@ -5,10 +6,15 @@ from generateRecommendatations import *
 
 def select_user(user_df):
     valid_choice = False
+    global users_df
+    print("[E] - Input an existing user ID")
+    print("[S] - Select from pre-chosen user IDs")
+    print("[N] - Create new user")
     while not valid_choice:
-        input_own_choice = input("Please enter [N] for inputting a chosen user id, or [S] to select from pre-chosen IDs: ")
+        input_own_choice = input("Please select from the options above: ")
 
         if input_own_choice.upper() == "S":
+            print()
             valid_choice = True
             print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
             print("[B] UHkDeBOmSKQCBIi9t8YzJw")
@@ -34,7 +40,8 @@ def select_user(user_df):
             print()
             return chosen_id
 
-        elif input_own_choice.upper() == "N":
+        elif input_own_choice.upper() == "E":
+            print()
             valid_input = False
             valid_choice = True
             while not valid_input:
@@ -52,8 +59,60 @@ def select_user(user_df):
                         print("INVALID INPUT - Sorry, it looks like we don't have any users with this ID")
             print()
             return chosen_id
+
+        elif input_own_choice.upper() == "N":
+            print()
+            valid_choice = True
+
+            # Generate date
+            creation_time = str(datetime.datetime.now())[:-7]
+
+            chosen_name = False
+            while not chosen_name:
+                name = input("Enter first name: ")
+                if name.isalpha():
+                    chosen_name = True
+                else:
+                    print("INVALID NAME - Please only include letters in your name")
+
+            user_id = gen_new_user_id(user_df)
+
+            new_user = {"user_id": user_id, "name": name, "review_count": 0, "yelping_since": creation_time,
+                        "useful": 0, "funny": 0, "cool": 0, "elite": "", "friends": "None", "fans": 0,
+                        "average_stars": 0.0, "compliment_hot": 0, "compliment_more": 0, "compliment_profile": 0,
+                        "compliment_cute": 0, "compliment_list": 0, "compliment_note": 0, "compliment_plain": 0,
+                        "compliment_cool": 0, "compliment_funny": 0, "compliment_writer": 0, "compliment_photos": 0,
+                        "display_num": 12, "blacklist": ""}
+
+            user_df = user_df.append(new_user, ignore_index=True)
+            user_df.to_csv("newDFUser.csv", index=0)
+
+            users_df = pd.read_csv("newDFUser.csv")
+            # id_search = user_df[user_df["user_id"] == user_id]
+            # blacklist = id_search['blacklist'].iloc[0]
+
+            print()
+            return user_id
+
         else:
             print("INVALID INPUT")
+
+
+def gen_new_user_id(users):
+    alphabet = list(string.ascii_letters) + ["_", "-"]
+    for i in range(0,10):
+        alphabet.append(str(i))
+
+    # Generate a random 22 long id which is not already in the users
+    valid_selection = False
+    while not valid_selection:
+        generated_id = ''.join(random.sample(alphabet, 22))
+        id_search = users[users["user_id"] == generated_id]
+
+        if len(id_search) == 0:
+            valid_selection = True
+
+    return generated_id
 
 
 def anything_else(user_id):
@@ -83,6 +142,9 @@ def anything_else(user_id):
 
 
 def main(new_user, existing_user):
+    global users_df
+    users_df = pd.read_csv("newDFUser.csv")
+
     if new_user:
         i_user_id = select_user(users_df)
     else:
@@ -125,6 +187,6 @@ def main(new_user, existing_user):
 
 businesses_df = pd.read_csv("newDFBusiness.csv")
 reviews_df = pd.read_csv("newDFReview.csv")
-users_df = pd.read_csv("newDFUser.csv")
+global users_df
 
 main(True, "")
