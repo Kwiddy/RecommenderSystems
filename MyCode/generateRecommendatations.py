@@ -11,12 +11,12 @@ def generate_recommendations(user_id, businesses_df, reviews_df, users_df):
     rated_items = find_user_rated(user_id, reviews_df)
 
     # Find the predictions for each item and find the items to be recommended
+    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices)
+
     #   To display is the users preference for the number of results to show
     id_search = users_df[users_df["user_id"] == user_id]
     to_display = id_search['display_num'].iloc[0]
-    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, to_display)
-
-    display_results(weighted_average, businesses_df)
+    display_results(weighted_average, businesses_df, to_display)
 
 
 def find_similarities(comparison_df):
@@ -45,7 +45,7 @@ def make_comparable(items_row):
     return comparable[1:]
 
 
-def find_predictions(matrix, user, rated, business_index, return_num):
+def find_predictions(matrix, user, rated, business_index):
     # Find the location of the reviewed items in the similarity matrix
     n_final_similarities = []
     d_final_similarities = []
@@ -118,21 +118,44 @@ def find_predictions(matrix, user, rated, business_index, return_num):
     sorted_predictions = sorted(predictions, reverse=True)
 
     # Only return the top n predictions
-    sorted_predictions = sorted_predictions[:return_num]
+    sorted_predictions = sorted_predictions
 
     return sorted_predictions
 
 
-def display_results(results, businesses_df):
-    output = pd.DataFrame()
-    first = True
-    for item in results:
-        item_id = item[1]
-        result = businesses_df.loc[businesses_df["business_id"] == item_id].copy()
-        result["Prediction"] = item[0]
-        if first:
-            output = result
-            first = False
+def display_results(results, businesses_df, return_num):
+    show_more = True
+    start = 0
+    while show_more:
+        output = pd.DataFrame()
+        first = True
+        for item in results[start:return_num]:
+            last_row = item
+            item_id = item[1]
+            result = businesses_df.loc[businesses_df["business_id"] == item_id].copy()
+            result["Prediction"] = item[0]
+            if first:
+                output = result
+                first = False
+            else:
+                output = pd.concat([output, result])
+        print(output)
+
+        # Ensures that the user can only keep displaying more recommendations up until the end of the recommendations
+        #       generated.
+        if last_row != results[-1]:
+            valid_choice = False
+            while not valid_choice:
+                yn = input("Display 10 more recommendations? [Y/N]: ")
+                if yn.upper() == "Y":
+                    valid_choice = True
+                    start += 10
+                    return_num += 10
+                elif yn.upper() == "N":
+                    valid_choice = True
+                    show_more = False
+                else:
+                    print("INVALID INPUT")
         else:
-            output = pd.concat([output, result])
-    print(output)
+            show_more = False
+    print()
