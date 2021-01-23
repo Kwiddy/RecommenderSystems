@@ -27,8 +27,7 @@ def edit_reviews(user_id, businesses, reviews, users):
 
         elif choice.upper() == "A":
             valid_choice = True
-            print("Amend")
-            # function to amend existing review
+            amend_reviews(user_id, reviews)
             anything_else(user_id, businesses, reviews, users)
 
         elif choice.upper() == "D":
@@ -181,7 +180,6 @@ def delete_review(user_id, reviews, businesses, users):
     reviews.to_csv("newDFReview.csv", index=0)
     print()
 
-    ## To do: average stars
 
 def gen_new_review_id(reviews):
     alphabet = list(string.ascii_letters) + ["_", "-"]
@@ -198,6 +196,62 @@ def gen_new_review_id(reviews):
             valid_selection = True
 
     return generated_id
+
+
+def amend_reviews(user_id, reviews):
+    print("--- Your existing reviews ---")
+    user_reviews = reviews[reviews["user_id"] == user_id]
+    print(user_reviews)
+    print()
+    valid_review = False
+    while not valid_review:
+        choice = input("Enter the ID of the review you wish to edit: ")
+        review_search = reviews[reviews["review_id"] == choice]
+        if len(review_search) != 0:
+            valid_review = True
+        else:
+            print("INVALID INPUT")
+    review_id = choice
+
+    # Editable:
+    #   Stars
+    #   Text
+    print("[S] - Stars given")
+    print("[T] - Review's text")
+    valid_choice = False
+    while not valid_choice:
+        choice = input("Please select from the options above: ")
+        if choice.upper() == "S":
+            valid_choice = True
+            valid_input = False
+            while not valid_input:
+                print("Please enter the number of stars you wish to rate this business [1-5]: ")
+                review_stars = input()
+                try:
+                    if int(review_stars) in range(1, 6):
+                        valid_input = True
+                        review_stars = str(int(review_stars)) + ".0"
+                except ValueError as e:
+                    print(e)
+                    valid_input = False
+            reviews.loc[reviews["review_id"] == review_id, "stars"] = str(review_stars)
+            print("Number of stars given has been changed to: ", review_stars)
+            reviews.to_csv("newDFReview.csv", index=0)
+
+        elif choice.upper() == "T":
+            valid_choice = True
+            print("Enter your new review text below:")
+            review_text = input()
+            reviews.loc[reviews["review_id"] == review_id, "text"] = review_text
+            reviews.to_csv("newDFReview.csv", index=0)
+            print("Review text has ben changed")
+        else:
+            print("INVALID INPUT")
+
+        print()
+        print("--- Your existing reviews ---")
+        user_reviews = reviews[reviews["user_id"] == user_id]
+        print(user_reviews)
 
 
 def anything_else(user_id, businesses, reviews, users):
