@@ -11,7 +11,10 @@ def generate_recommendations(user_id, businesses_df, reviews_df, users_df):
     rated_items = find_user_rated(user_id, reviews_df)
 
     # Find the predictions for each item and find the items to be recommended
-    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, 12)
+    #   To display is the users preference for the number of results to show
+    id_search = users_df[users_df["user_id"] == user_id]
+    to_display = id_search['display_num'].iloc[0]
+    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, to_display)
 
     display_results(weighted_average, businesses_df)
 

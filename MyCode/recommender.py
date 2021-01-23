@@ -1,4 +1,5 @@
 from editReviews import *
+from updatePreferences import *
 from generateRecommendatations import *
 
 
@@ -105,6 +106,10 @@ def main(new_user, existing_user):
             valid_choice = True
             print()
             edit_reviews(i_user_id, businesses_df, reviews_df, users_df)
+        elif choice.upper() == "P":
+            valid_choice = True
+            print()
+            update_preferences(i_user_id, users_df)
         elif choice.upper() == "X":
             exit()
         else:
