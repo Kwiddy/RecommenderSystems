@@ -3,6 +3,7 @@ import pandas as pd
 
 def update_preferences(user_id, users_df, businesses_df):
     print("[N] - Change number of recommendations displayed")
+    print("[S] - Choose a minimum number of stars for recommendations")
     print("[U] - Update blacklisted sites")
     print("[B] - Return")
     print("[X] - Exit")
@@ -17,6 +18,10 @@ def update_preferences(user_id, users_df, businesses_df):
             print()
             valid_choice = True
             update_blacklist(user_id, users_df, businesses_df)
+        elif selection.upper() == "S":
+            print()
+            valid_choice = True
+            update_min_stars(user_id, users_df)
         elif selection.upper() != "B":
             if selection.upper() == "X":
                 valid_choice = True
@@ -26,6 +31,30 @@ def update_preferences(user_id, users_df, businesses_df):
         else:
             valid_choice = True
     print()
+
+
+def update_min_stars(user, users_df):
+    id_search = users_df[users_df["user_id"] == user]
+    min_stars = id_search['min_stars'].iloc[0]
+
+    valid_input = False
+    while not valid_input:
+        choice = input("Enter a minimum number of stars for recommendations [1-5, or [C] to cancel] (Current: " + str(min_stars) + "): ")
+        if choice.upper() != "C":
+            try:
+                if int(choice) in range(1, 6):
+                    valid_input = True
+                    choice = int(choice)
+            except ValueError:
+                print("INVALID INPUT")
+                valid_input = False
+        else:
+            valid_input = True
+
+    if choice.upper() != "C":
+        users_df.loc[users_df["user_id"] == user, "min_stars"] = str(choice)
+        print("Number of stars given has been changed to: ", choice)
+        users_df.to_csv("newDFUser.csv", index=0)
 
 
 def update_blacklist(user_id, users_df, businesses_df):

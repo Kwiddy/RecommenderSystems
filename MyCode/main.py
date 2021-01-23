@@ -5,10 +5,10 @@ from generateRecommendatations import *
 
 
 def welcome_page():
-    print("|===================================|")
-    print("|--= THE SPORTS BARS RECOMMENDER =--|")
-    print("|        ==--- Toronto ---==        |")
-    print("|===================================|")
+    print("|=====================================================|")
+    print("|-----------= THE SPORTS BARS RECOMMENDER =-----------|")
+    print("|                 ==--- Toronto ---==                 |")
+    print("|=====================================================|")
     print()
 
 

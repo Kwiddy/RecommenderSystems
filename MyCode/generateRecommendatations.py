@@ -18,7 +18,7 @@ def generate_recommendations(user_id, businesses_df, reviews_df, users_df):
         blacklist = blacklist_str.split(",")
 
     # Find the predictions for each item and find the items to be recommended
-    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, blacklist)
+    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, businesses_df, users_df, blacklist)
 
     #   To display is the users preference for the number of results to show
     id_search = users_df[users_df["user_id"] == user_id]
@@ -52,7 +52,7 @@ def make_comparable(items_row):
     return comparable[1:]
 
 
-def find_predictions(matrix, user, rated, business_index, blacklist):
+def find_predictions(matrix, user, rated, business_index, businesses_df, users_df, blacklist):
     # Find the location of the reviewed items in the similarity matrix
     n_final_similarities = []
     d_final_similarities = []
@@ -127,6 +127,16 @@ def find_predictions(matrix, user, rated, business_index, blacklist):
     # remove blacklisted items
     for item in sorted_predictions:
         if item[1] in blacklist:
+            sorted_predictions.remove(item)
+
+    # remove items with a below minimum number of stars (from preferences)
+    id_search = users_df[users_df["user_id"] == user]
+    min_stars = id_search['min_stars'].iloc[0]
+    for item in sorted_predictions:
+        business_search = businesses_df[businesses_df["business_id"] == item[1]]
+        num_stars = business_search['stars'].iloc[0]
+        num_stars = int(num_stars)
+        if num_stars < int(min_stars):
             sorted_predictions.remove(item)
 
     return sorted_predictions

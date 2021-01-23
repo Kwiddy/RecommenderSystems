@@ -51,6 +51,10 @@ def refine_users():
 
     # Add a column for blacklisted businesses
     rdf["blacklist"] = ""
+
+    # Add a column for minimum number of stars
+    rdf["min_stars"] = 1
+
     return rdf
 
 
