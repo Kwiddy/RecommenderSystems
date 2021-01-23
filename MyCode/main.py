@@ -90,7 +90,7 @@ def main(new_user, existing_user):
 
     # Allow user to choose their service
     print("[G] - Generate list of recommendations")
-    print("[R] - Add/Amend/Delete a Review")
+    print("[R] - Add/Amend/View/Delete a Review")
     print("[P] - Update user preferences")
     print("[X] - Exit")
 

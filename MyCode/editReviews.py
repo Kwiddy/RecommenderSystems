@@ -8,10 +8,10 @@ import numpy as np
 def edit_reviews(user_id, businesses, reviews, users):
     # Display current reviews
     reviews = pd.read_csv("newDFReview.csv")
-    display_reviews(user_id, reviews)
 
     # Give the option to Add, Amend, Delete
     print("[N] - Add a new review")
+    print("[V] - View Reviews")
     print("[A] - Amend an existing review")
     print("[D] - Delete an existing review")
     print("[B] - Back")
@@ -35,6 +35,10 @@ def edit_reviews(user_id, businesses, reviews, users):
             valid_choice = True
             delete_review(user_id, reviews, businesses, users)
             anything_else(user_id, businesses, reviews, users)
+
+        elif choice.upper() == "V":
+            valid_choice = True
+            display_reviews(user_id, reviews)
 
         elif choice.upper() == "B":
             valid_choice = True
@@ -210,6 +214,59 @@ def anything_else(user_id, businesses, reviews, users):
 
 
 def display_reviews(user, reviews):
-    user_reviews = reviews[reviews["user_id"] == user]
-    print(user_reviews)
     print()
+    print("[M] - Display all of my reviews")
+    print("[U] - Search for reviews by user")
+    print("[B] - Search for reviews by business")
+    print("[X] - Return")
+    valid_choice = False
+    while not valid_choice:
+        choice = input("Please choose from the selection above: ")
+
+        if choice.upper() == "M":
+            valid_choice = True
+            user_reviews = reviews[reviews["user_id"] == user]
+            print(user_reviews)
+            print()
+            display_reviews(user, reviews)
+
+        elif choice.upper() == "U":
+            valid_choice = True
+            valid_user = False
+            while not valid_user:
+                print()
+                chosen_user = input("Please enter a user ID (or [X] to exit): ")
+                if chosen_user.upper() != "X":
+                    user_reviews = reviews[reviews["user_id"] == chosen_user]
+                    if len(user_reviews) == 0:
+                        print("Invalid User ID")
+                    else:
+                        valid_user = True
+                        print(user_reviews)
+                else:
+                    valid_user = True
+            display_reviews(user, reviews)
+
+        elif choice.upper() == "B":
+            valid_choice = True
+            valid_business = False
+            while not valid_business:
+                print()
+                chosen_business = input("Please enter a business ID (or [X] to exit): ")
+                if chosen_business.upper() != "X":
+                    business_reviews = reviews[reviews["business_id"] == chosen_business]
+                    if len(business_reviews) == 0:
+                        print("Invalid business ID")
+                    else:
+                        valid_business = True
+                        print(business_reviews)
+                else:
+                    valid_business = True
+            display_reviews(user, reviews)
+
+        elif choice.upper() != "X":
+            print("INVALID INPUT")
+
+        else:
+            valid_choice = True
+            print()
