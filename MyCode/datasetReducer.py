@@ -46,10 +46,8 @@ def refine_by_covid():
 def refine_users():
     rdf = dfUsers[dfUsers["user_id"].isin(newDFReview["user_id"])]
 
-    ### Add columns for user preferences:
-
-    # Add a column for preferred number of recommendations to display (default 12)
-    rdf = rdf.assign(display_num=12)
+    # Add a column for preferred number of recommendations to display (default 8)
+    rdf = rdf.assign(display_num=8)
 
     # Add a column for blacklisted businesses
     rdf["blacklist"] = ""

@@ -155,11 +155,11 @@ def display_results(results, businesses_df, return_num):
         if last_row != results[-1]:
             valid_choice = False
             while not valid_choice:
-                yn = input("Display 10 more recommendations? [Y/N]: ")
+                yn = input("Display 8 more recommendations? [Y/N]: ")
                 if yn.upper() == "Y":
                     valid_choice = True
-                    start += 10
-                    return_num += 10
+                    start += 8
+                    return_num += 8
                 elif yn.upper() == "N":
                     valid_choice = True
                     show_more = False
