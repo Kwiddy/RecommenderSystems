@@ -4,12 +4,21 @@ from updatePreferences import *
 from generateRecommendatations import *
 
 
+def welcome_page():
+    print("|===================================|")
+    print("|--= THE SPORTS BARS RECOMMENDER =--|")
+    print("|        ==--- Toronto ---==        |")
+    print("|===================================|")
+    print()
+
+
 def select_user(user_df):
     valid_choice = False
     global users_df
     print("[E] - Input an existing user ID")
     print("[S] - Select from pre-chosen user IDs")
     print("[N] - Create new user")
+    print("[X] - Exit")
     while not valid_choice:
         input_own_choice = input("Please select from the options above: ")
 
@@ -93,6 +102,10 @@ def select_user(user_df):
 
             print()
             return user_id
+
+        elif input_own_choice.upper() == "X":
+            valid_choice = False
+            exit()
 
         else:
             print("INVALID INPUT")
@@ -189,4 +202,5 @@ businesses_df = pd.read_csv("newDFBusiness.csv")
 reviews_df = pd.read_csv("newDFReview.csv")
 global users_df
 
+welcome_page()
 main(True, "")
