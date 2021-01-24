@@ -25,22 +25,22 @@ def select_user(user_df):
         if input_own_choice.upper() == "S":
             print()
             valid_choice = True
-            print("[A] 2U2tqOCphgOQ-NX8b3P6nw")
-            print("[B] UHkDeBOmSKQCBIi9t8YzJw")
-            print("[C] deB6EXuanGiN1tkSASuh3A")
+            print("[A] - fkLVpxbHNmeqgIl7O4GztA (Reviews: 6)")
+            print("[B] - deB6EXuanGiN1tkSASuh3A (Reviews: 5)")
+            print("[C] - Kj9cFO70zZOQorN0mgeLWA (Reviews: 3)")
             print("[X] - Exit")
 
             valid = False
             while not valid:
                 choice = input("Input the letter corresponding to an ID: ")
                 if choice.upper() == "A":
-                    chosen_id = "2U2tqOCphgOQ-NX8b3P6nw"
+                    chosen_id = "fkLVpxbHNmeqgIl7O4GztA"
                     valid = True
                 elif choice.upper() == "B":
-                    chosen_id = "UHkDeBOmSKQCBIi9t8YzJw"
+                    chosen_id = "deB6EXuanGiN1tkSASuh3A"
                     valid = True
                 elif choice.upper() == "C":
-                    chosen_id = "deB6EXuanGiN1tkSASuh3A"
+                    chosen_id = "Kj9cFO70zZOQorN0mgeLWA"
                     valid = True
                 elif choice.upper() == "X":
                     exit()
