@@ -1,4 +1,4 @@
-from generateRecommendatations import *
+from recommenderOne import *
 
 
 def generate_recommendations(user_id, businesses_df, reviews_df, users_df):
