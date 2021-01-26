@@ -93,7 +93,8 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         temp.append(temp2)
     n_final_similarities = temp
 
-    # numerator = SUM(multiply user's rating by the similarity score between item being predicted and each item in reviewed)
+    # numerator:
+    # SUM(multiply user's rating by the similarity score between item being predicted and each item in reviewed)
     numerators = []
 
     for j in range(len(n_final_similarities[0])):
@@ -103,7 +104,8 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
             sum_total += n_final_similarities[i][j][0]
         numerators.append([sum_total, predict_id])
 
-    # denominator = SUM(ABS(each similarity between the item being predicted and each item in reviewed))
+    # denominator:
+    # SUM(ABS(each similarity between the item being predicted and each item in reviewed))
     denominators = []
 
     for j in range(len(d_final_similarities[0])):
