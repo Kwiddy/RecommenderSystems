@@ -1,7 +1,7 @@
 import datetime
 from editReviews import *
 from updatePreferences import *
-from generateRecommendatations import *
+from hybridRecommender import *
 
 
 def welcome_page():

@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-def generate_recommendations(user_id, businesses_df, reviews_df, users_df):
+def recommender_one(user_id, businesses_df, reviews_df, users_df):
     # find the similarity matrix between all businesses and store locations for later use
     similarity_matrix, indices = find_similarities(businesses_df)
 
