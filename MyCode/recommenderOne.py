@@ -1,3 +1,4 @@
+# imports
 import math
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
@@ -26,32 +27,44 @@ def recommender_one(user_id, businesses_df, reviews_df, users_df):
     display_results(weighted_average, businesses_df, to_display)
 
 
+# Find the similarity matrix between businesses
 def find_similarities(comparison_df):
     comparison_df = comparison_df.set_index("business_id")
     new_df = []
     stored_indices = []
 
+    # Store indices of each row
     for index, row in comparison_df.iterrows():
         stored_indices.append(index)
+
+        # Refine the data in each row so that it can be compared
         row = make_comparable(row)
+
+        # Add the new row to the new dataframe
         new_df.append(row)
 
+    # Return the cosine similarities of the new dataframe along with the stored indices
     return cosine_similarity(new_df), stored_indices
 
 
+# Find the businesses in the refined dataset which the user has rated
 def find_user_rated(user, rdf):
     user_reviews = rdf[rdf["user_id"] == user]
     return user_reviews
 
 
+# Make a row from the businesses dataframe comparable
 def make_comparable(items_row):
     comparable = []
+
+    # remove any cell which is not a numeric type
     for item in items_row:
         if type(item) in [float, int] and not math.isnan(item):
             comparable.append(item)
     return comparable[1:]
 
 
+# Calculate predictions for each item and find the items to be recommended
 def find_predictions(matrix, user, rated, business_index, businesses_df, users_df, blacklist):
     # Find the location of the reviewed items in the similarity matrix
     n_final_similarities = []
@@ -141,25 +154,35 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         if num_stars < int(min_stars):
             sorted_predictions.remove(item)
 
+    # Return the list of sorted predictions
     return sorted_predictions
 
 
+# Display the results from the recommender
 def display_results(results, businesses_df, return_num):
     show_more = True
     start = 0
+    # The show more loop allows the user to continuously display more recommendations
     while show_more:
         output = pd.DataFrame()
         first = True
+
+        # Display the next n items from the sorted list of recommendations
         for item in results[start:return_num]:
+            # Format the item for outputting
             last_row = item
             item_id = item[1]
             result = businesses_df.loc[businesses_df["business_id"] == item_id].copy()
             result["Prediction"] = item[0]
+
+            # Add the item to the output
             if first:
                 output = result
                 first = False
             else:
                 output = pd.concat([output, result])
+
+        # Print the next back of recommended items
         print(output)
 
         # Ensures that the user can only keep displaying more recommendations up until the end of the recommendations
