@@ -116,7 +116,7 @@ def select_user(user_df):
                         "average_stars": 0.0, "compliment_hot": 0, "compliment_more": 0, "compliment_profile": 0,
                         "compliment_cute": 0, "compliment_list": 0, "compliment_note": 0, "compliment_plain": 0,
                         "compliment_cool": 0, "compliment_funny": 0, "compliment_writer": 0, "compliment_photos": 0,
-                        "display_num": 12, "blacklist": ""}
+                        "display_num": 12, "blacklist": "", "min_stars": 1, "recommend_seen": "Y"}
 
             # Append the new user to the users dataset and save
             user_df = user_df.append(new_user, ignore_index=True)

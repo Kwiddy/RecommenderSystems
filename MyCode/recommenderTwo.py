@@ -17,6 +17,7 @@ def recommender_two(user_id):
     businesses_df = pd.read_csv("newDFBusiness.csv")
 
     # Content analyser - Represent items' content in a structured form
+    analysis = content_analyser(user_id, users_df, businesses_df, reviews_df)
 
     # Profile learner - Collect and generalise user preference data and construct user profile
 
@@ -24,3 +25,7 @@ def recommender_two(user_id):
     #   Match user profile representation to item representations
     #   Generate a prediction / relevance judgment / score
     #   Present a (ranked) list of item recommendations
+
+
+def content_analyser(user_id, users_df, businesses_df, reviews_df):
+    return "hi"
