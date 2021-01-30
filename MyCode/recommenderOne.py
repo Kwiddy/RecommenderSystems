@@ -1,10 +1,18 @@
+# This is a neighbourhood-based collaborative filtering method (item-based)
+
 # imports
 import math
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-def recommender_one(user_id, businesses_df, reviews_df, users_df):
+def recommender_one(user_id):
+
+    # Update the reviews
+    reviews_df = pd.read_csv("newDFReview.csv")
+    users_df = pd.read_csv("newDFUser.csv")
+    businesses_df = pd.read_csv("newDFBusiness.csv")
+
     # find the similarity matrix between all businesses and store locations for later use
     similarity_matrix, indices = find_similarities(businesses_df)
 
@@ -19,7 +27,8 @@ def recommender_one(user_id, businesses_df, reviews_df, users_df):
         blacklist = blacklist_str.split(",")
 
     # Find the predictions for each item and find the items to be recommended
-    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, businesses_df, users_df, blacklist)
+    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, businesses_df, users_df,
+                                        reviews_df, blacklist)
 
     #   To display is the users preference for the number of results to show
     id_search = users_df[users_df["user_id"] == user_id]
@@ -65,7 +74,7 @@ def make_comparable(items_row):
 
 
 # Calculate predictions for each item and find the items to be recommended
-def find_predictions(matrix, user, rated, business_index, businesses_df, users_df, blacklist):
+def find_predictions(matrix, user, rated, business_index, businesses_df, users_df, reviews_df, blacklist):
     # Find the location of the reviewed items in the similarity matrix
     n_final_similarities = []
     d_final_similarities = []
@@ -153,6 +162,17 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         num_stars = int(num_stars)
         if num_stars < int(min_stars):
             sorted_predictions.remove(item)
+
+    # If the user has chosen not to recommend previously reviewed items then remove them from the predictions
+    prev_seen_pref = id_search['recommend_seen'].iloc[0]
+    to_remove = []
+    if prev_seen_pref == "N":
+        user_reviews = reviews_df[reviews_df["user_id"] == user]
+        for index, row in user_reviews.iterrows():
+            to_remove.append(row["business_id"])
+        for item in sorted_predictions:
+            if item[1] in to_remove:
+                sorted_predictions.remove(item)
 
     # Return the list of sorted predictions
     return sorted_predictions

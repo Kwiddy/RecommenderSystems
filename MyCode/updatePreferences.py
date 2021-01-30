@@ -8,6 +8,7 @@ def update_preferences(user_id, users_df, businesses_df):
     print("[N] - Change number of recommendations displayed")
     print("[S] - Choose a minimum number of stars for recommendations")
     print("[U] - Update blacklisted sites")
+    print("[R] - Recommend previously reviewed items or not")
     print("[B] - Return")
     print("[X] - Exit")
     valid_choice = False
@@ -19,6 +20,12 @@ def update_preferences(user_id, users_df, businesses_df):
             print()
             valid_choice = True
             update_display_num(user_id, users_df, businesses_df)
+
+        # Allow the user to choose if they wish the recommender to recommend places they've already reviewed or not
+        elif selection.upper() == "R":
+            print()
+            valid_choice = True
+            update_review_seen(user_id, users_df)
 
         # Allow the user to have a list of blacklisted businesses which won't be recommended
         elif selection.upper() == "U":
@@ -46,6 +53,39 @@ def update_preferences(user_id, users_df, businesses_df):
         else:
             valid_choice = True
     print()
+
+
+# Preference: Define if they wish to have items recommended which they've already reviewed
+def update_review_seen(user, users_df):
+    # Find the current preference (default: Yes (Yes, they do wish reviewed items to be recommended))
+    id_search = users_df[users_df["user_id"] == user]
+    current_status = id_search['recommend_seen'].iloc[0]
+
+    # Convert to text so easier for user to understand
+    if current_status == "Y":
+        current_status = "YES"
+    else:
+        current_status = "NO"
+
+    # Allow user to make choice
+    valid_input = False
+    while not valid_input:
+        yn = input("Would you like your previously recommended bars to be recommended to you if they are suitable? "
+                   "[Y/N or C to cancel] (Currently " + current_status + "): ")
+        if yn.upper() == "Y":
+            valid_input = True
+            users_df.loc[users_df["user_id"] == user, "recommend_seen"] = yn.upper()
+            print("Preference has been changed to: YES")
+            users_df.to_csv("newDFUser.csv", index=0)
+        elif yn.upper() == "N":
+            valid_input = True
+            users_df.loc[users_df["user_id"] == user, "recommend_seen"] = yn.upper()
+            print("Preference has been changed to: NO")
+            users_df.to_csv("newDFUser.csv", index=0)
+        elif yn.upper() == "C":
+            valid_input = True
+        else:
+            print("INVALID INPUT")
 
 
 # Preference: define a minimum number of stars required

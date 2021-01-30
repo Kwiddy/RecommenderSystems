@@ -59,6 +59,9 @@ def refine_users():
     # Add a column for minimum number of stars
     rdf["min_stars"] = 1
 
+    # Add a column for preference of recommending already reviewed businesses (default Yes)
+    rdf["recommend_seen"] = "Y"
+
     return rdf
 
 
