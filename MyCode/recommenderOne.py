@@ -30,10 +30,8 @@ def recommender_one(user_id):
     weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, businesses_df, users_df,
                                         reviews_df, blacklist)
 
-    #   To display is the users preference for the number of results to show
-    id_search = users_df[users_df["user_id"] == user_id]
-    to_display = id_search['display_num'].iloc[0]
-    display_results(weighted_average, businesses_df, to_display)
+    # Return recommender predictions
+    return weighted_average
 
 
 # Find the similarity matrix between businesses
@@ -176,50 +174,3 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
 
     # Return the list of sorted predictions
     return sorted_predictions
-
-
-# Display the results from the recommender
-def display_results(results, businesses_df, return_num):
-    show_more = True
-    start = 0
-    # The show more loop allows the user to continuously display more recommendations
-    while show_more:
-        output = pd.DataFrame()
-        first = True
-
-        # Display the next n items from the sorted list of recommendations
-        for item in results[start:return_num]:
-            # Format the item for outputting
-            last_row = item
-            item_id = item[1]
-            result = businesses_df.loc[businesses_df["business_id"] == item_id].copy()
-            result["Prediction"] = item[0]
-
-            # Add the item to the output
-            if first:
-                output = result
-                first = False
-            else:
-                output = pd.concat([output, result])
-
-        # Print the next back of recommended items
-        print(output)
-
-        # Ensures that the user can only keep displaying more recommendations up until the end of the recommendations
-        #       generated.
-        if last_row != results[-1]:
-            valid_choice = False
-            while not valid_choice:
-                yn = input("Display 8 more recommendations? [Y/N]: ")
-                if yn.upper() == "Y":
-                    valid_choice = True
-                    start += 8
-                    return_num += 8
-                elif yn.upper() == "N":
-                    valid_choice = True
-                    show_more = False
-                else:
-                    print("INVALID INPUT")
-        else:
-            show_more = False
-    print()
