@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def recommender_one(user_id):
 
-    # Update the reviews
+    # Update the dataframes
     reviews_df = pd.read_csv("newDFReview.csv")
     users_df = pd.read_csv("newDFUser.csv")
     businesses_df = pd.read_csv("newDFBusiness.csv")
