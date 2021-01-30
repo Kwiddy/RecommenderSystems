@@ -59,16 +59,6 @@ def add_new_review(user_id, reviews, businesses, users):
 
     valid_input = False
     while not valid_input:
-        print("Please enter the text of your review: ")
-        review_text = input()
-        if len(review_text) > 0:
-            valid_input = True
-            print()
-        else:
-            print("PLEASE ENTER SOME REVIEW TEXT")
-
-    valid_input = False
-    while not valid_input:
         print("Please enter the id or name of the business:")
         review_business_input = input()
         id_search = businesses[businesses["business_id"] == review_business_input]
@@ -85,39 +75,65 @@ def add_new_review(user_id, reviews, businesses, users):
             print("INVALID NAME OR BUSINESS")
     print()
 
-    valid_input = False
-    while not valid_input:
-        print("Please enter the number of stars you wish to rate this business [1-5]: ")
-        review_stars = input()
-        try:
-            if int(review_stars) in range(1, 6):
+    # Detect if the user has already reviewed the chosen business and if so, give them the option to
+    #   edit their review instead
+    # review_business_id
+    user_reviews = reviews[reviews["user_id"] == user_id]
+    prev_reviewed_business = False
+    for index, row in user_reviews.iterrows():
+        if review_business_id == row["business_id"]:
+            prev_reviewed_business = True
+            break
+    if prev_reviewed_business:
+        print("You have already reviewed this business, if you wish, you may instead edit this review in the edit "
+              "section")
+        print()
+    else:
+
+        # Take the text of the review
+        valid_input = False
+        while not valid_input:
+            print("Please enter the text of your review: ")
+            review_text = input()
+            if len(review_text) > 0:
                 valid_input = True
                 print()
-                review_stars = str(int(review_stars)) + ".0"
-        except ValueError as e:
-            print(e)
-            valid_input = False
+            else:
+                print("PLEASE ENTER SOME REVIEW TEXT")
 
-    # Generate date
-    review_time = str(datetime.datetime.now())[:-7]
+        valid_input = False
+        while not valid_input:
+            print("Please enter the number of stars you wish to rate this business [1-5]: ")
+            review_stars = input()
+            try:
+                if int(review_stars) in range(1, 6):
+                    valid_input = True
+                    print()
+                    review_stars = str(int(review_stars)) + ".0"
+            except ValueError as e:
+                print(e)
+                valid_input = False
 
-    # update reviews dataframe
-    new_review = {'review_id': review_id, 'user_id': user_id, 'business_id': review_business_id, 'stars': review_stars,
-                  'useful': 0, 'funny': 0, 'cool': 0, 'text': review_text, 'date': review_time}
-    reviews = reviews.append(new_review, ignore_index=True)
-    reviews.to_csv("newDFReview.csv", index=0)
+        # Generate date
+        review_time = str(datetime.datetime.now())[:-7]
 
-    # update review count, do I need to update stars?
-    businesses.loc[businesses["business_id"] == review_business_input, "review_count"] += 1
-    businesses.to_csv("newDFBusiness.csv", index=0)
+        # update reviews dataframe
+        new_review = {'review_id': review_id, 'user_id': user_id, 'business_id': review_business_id, 'stars': review_stars,
+                      'useful': 0, 'funny': 0, 'cool': 0, 'text': review_text, 'date': review_time}
+        reviews = reviews.append(new_review, ignore_index=True)
+        reviews.to_csv("newDFReview.csv", index=0)
 
-    # Edit user's number of reviews and average stars
-    users['average_stars'] = np.where(users['user_id'] == user_id, round(((users['average_stars']*users["review_count"])+int(review_stars[:-2]))/(users["review_count"]+1), 2), users['average_stars'])
-    users.loc[users["user_id"] == user_id, "review_count"] += 1
-    users.to_csv("newDFUser.csv", index=0)
+        # update review count, do I need to update stars?
+        businesses.loc[businesses["business_id"] == review_business_input, "review_count"] += 1
+        businesses.to_csv("newDFBusiness.csv", index=0)
 
-    print("Review created with id: ", review_id)
-    print()
+        # Edit user's number of reviews and average stars
+        users['average_stars'] = np.where(users['user_id'] == user_id, round(((users['average_stars']*users["review_count"])+int(review_stars[:-2]))/(users["review_count"]+1), 2), users['average_stars'])
+        users.loc[users["user_id"] == user_id, "review_count"] += 1
+        users.to_csv("newDFUser.csv", index=0)
+
+        print("Review created with id: ", review_id)
+        print()
 
 
 def delete_review(user_id, reviews, businesses, users):
