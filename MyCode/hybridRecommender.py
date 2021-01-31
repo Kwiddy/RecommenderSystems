@@ -130,6 +130,7 @@ def more_details(rank, recommendations, businesses):
         else:
             valid_choice = True
 
+    # Print the details of the business in a readable format
     if business != "C" and business != "c":
         # Locate the business
         result = recommendations.loc[business, :]
@@ -139,8 +140,6 @@ def more_details(rank, recommendations, businesses):
         full_business = businesses.loc[(businesses['name'] == result_name) & (businesses['address'] == result_addr) &
                                        (businesses['postal_code'] == result_postal)].copy()
 
-        # Print the details of the business in a readable format
-        # attributes,hours
         print()
         print("Name: ", full_business.iloc[0]["name"])
         print("ID: ", full_business.iloc[0]["business_id"])

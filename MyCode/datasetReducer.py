@@ -62,6 +62,10 @@ def refine_users():
     # Add a column for preference of recommending already reviewed businesses (default Yes)
     rdf["recommend_seen"] = "Y"
 
+    # Add a column, later to contain a string-dictionary, where further preferences are contained such as requiring
+    #   wheelchair access
+    rdf["advanced_preferences"] = ""
+
     return rdf
 
 

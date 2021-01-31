@@ -1,5 +1,7 @@
 # imports
 import pandas as pd
+import numpy as np
+from ast import literal_eval
 
 
 # Update user preferences
@@ -9,6 +11,7 @@ def update_preferences(user_id, users_df, businesses_df):
     print("[S] - Choose a minimum number of stars for recommendations")
     print("[U] - Update blacklisted sites")
     print("[R] - Recommend previously reviewed items or not")
+    print("[A] - Advanced Recommender Preferences")
     print("[B] - Return")
     print("[X] - Exit")
     valid_choice = False
@@ -38,6 +41,12 @@ def update_preferences(user_id, users_df, businesses_df):
             print()
             valid_choice = True
             update_min_stars(user_id, users_df)
+
+        # Allow the users to refine the recommendations further, e.g. by wheelchair access
+        elif selection.upper() == "A":
+            print()
+            valid_choice = True
+            advanced_options(user_id, users_df)
 
         elif selection.upper() != "B":
             # Allow the user to exit the program
@@ -86,6 +95,66 @@ def update_review_seen(user, users_df):
             valid_input = True
         else:
             print("INVALID INPUT")
+
+
+# Preference: Allow further refinement of businesses to recommend
+def advanced_options(user, users_df):
+    # Find the current preferences
+    id_search = users_df[users_df["user_id"] == user]
+    preferences = id_search['advanced_preferences'].iloc[0]
+
+    # Retrieve and display their existing preferences
+    if np.isnan(preferences):
+        preferences = {}
+        print("You have not yet specified any particular preferences")
+    else:
+        preferences = literal_eval(preferences)
+        print("Your current preferences")
+        for preference in preferences:
+            print(preference + ": " + str(preferences[preference]))
+
+    # Present menu and take valid input of user's choicer
+    print("[A] - Add a preference")
+    print("[D] - Delete a preference")
+    print("[E] - Edit a preference")
+    print("[B] - Return")
+    print("[X] - Exit")
+    valid_choice = False
+    while not valid_choice:
+        choice = input("Please enter one of the options above")
+
+        # Allow the user to add a new advanced preference
+        if choice.upper() == "A":
+            print()
+            valid_choice = True
+            #
+
+        # Allow the user to delete an existing advanced preference
+        elif choice.upper() == "D":
+            print()
+            valid_choice = True
+            #
+
+        # Allow the user to edit their existing advanced preferences
+        elif choice.upper() == "E":
+            print()
+            valid_choice = True
+            #
+
+        # Detect invalid inputs or a wish to close the program
+        elif choice.upper() != "B":
+            if choice.upper() == "X":
+                print("Closing program")
+                valid_choice = True
+                exit()
+            else:
+                print("INVALID INPUT - Please select from the options above")
+
+        # Alow the user to return from this section
+        else:
+            valid_choice = True
+            print()
+
 
 
 # Preference: define a minimum number of stars required
