@@ -303,7 +303,6 @@ def add_preference(preferences, businesses, users, user_id):
             if choice.upper() != "C":
                 # If the preference is already in list of their preferences then change it, otherwise add it
                 preferences[chosen] = chosen_preference
-                print(preferences)
 
                 # Save the new user preferences
                 users.loc[users["user_id"] == user_id, "advanced_preferences"] = str(preferences)
