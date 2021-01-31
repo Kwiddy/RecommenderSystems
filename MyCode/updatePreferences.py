@@ -142,7 +142,7 @@ def advanced_options(user, users_df, businesses_df):
         elif choice.upper() == "D":
             print()
             valid_choice = True
-            #
+            delete_preference(user, users_df, preferences)
             anything_else(user, users_df, businesses_df)
 
 
@@ -159,6 +159,37 @@ def advanced_options(user, users_df, businesses_df):
         else:
             valid_choice = True
             print()
+
+
+# Allow user to delete their advanced preferences
+def delete_preference(user, users_df, preferences):
+    # Present the current preferences to choose from
+    for item in preferences:
+        print(item + " (Currently: " + preferences[item] + ")")
+        saved_example = item
+
+    # Allow the user to select one to delete
+    valid_choice = False
+    while not valid_choice:
+        choice = input("Please enter an entry to be removed, for example: " + saved_example + ", (or [C] to cancel): ")
+        if choice.upper() != "C":
+            if preferences.get(choice) is not None:
+                valid_choice = True
+        else:
+            valid_choice = True
+        if not valid_choice:
+            print("INVALID INPUT")
+
+    if choice.upper() != "C":
+        # Remove the chosen preference
+        preferences.pop(choice)
+
+        # Save the updated preferences to the user's profile
+        users_df.loc[users_df["user_id"] == user, "advanced_preferences"] = str(preferences)
+        users_df.to_csv("newDFUser.csv", index=0)
+
+        # Notify user
+        print("Your preferences have been updated...")
 
 
 # Allow user to add an advanced preference, these align with disabilities and additional requirements
@@ -197,7 +228,7 @@ def add_preference(preferences, businesses, users, user_id):
     if choice.upper() != "C":
         # Check to see if user already has a preference for this selection
         no_change = False
-        if preferences.get(options[choice]) != None:
+        if preferences.get(options[choice]) is not None:
             valid = False
             current_choice = preferences.get(options[choice])
             while not valid:
@@ -279,8 +310,6 @@ def add_preference(preferences, businesses, users, user_id):
                 users.to_csv("newDFUser.csv", index=0)
                 print("Your preferences have been updated")
                 print()
-
-
 
 
 # Preference: define a minimum number of stars required
