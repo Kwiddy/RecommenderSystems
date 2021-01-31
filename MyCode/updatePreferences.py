@@ -103,31 +103,39 @@ def advanced_options(user, users_df, businesses_df):
     id_search = users_df[users_df["user_id"] == user]
     preferences = id_search['advanced_preferences'].iloc[0]
 
+    # print(preferences)
     # Retrieve and display their existing preferences
-    if np.isnan(preferences):
-        preferences = {}
-        print("You have not yet specified any particular preferences")
-    else:
+    try:
         preferences = literal_eval(preferences)
-        print("Your current preferences")
+        print("Your current preferences:")
         for preference in preferences:
             print(preference + ": " + str(preferences[preference]))
+        print()
+    except:
+        if np.isnan(preferences):
+            preferences = {}
+            print("You have not yet specified any particular preferences")
+        else:
+            preferences = literal_eval(preferences)
+            print("Your current preferences:")
+            for preference in preferences:
+                print(preference + ": " + str(preferences[preference]))
+            print()
 
     # Present menu and take valid input of user's choicer
-    print("[A] - Add an advanced preference")
+    print("[A] - Add / Amend advanced preferences")
     print("[D] - Delete an advanced preference")
-    print("[E] - Edit an advanced preference")
     print("[B] - Return")
     print("[X] - Exit")
     valid_choice = False
     while not valid_choice:
-        choice = input("Please enter one of the options above")
+        choice = input("Please enter one of the options above: ")
 
-        # Allow the user to add a new advanced preference
+        # Allow the user to add and delete advanced preferences
         if choice.upper() == "A":
             print()
             valid_choice = True
-            preferences = add_preference(preferences)
+            add_preference(preferences, businesses_df, users_df, user)
             anything_else(user, users_df, businesses_df)
 
         # Allow the user to delete an existing advanced preference
@@ -137,12 +145,6 @@ def advanced_options(user, users_df, businesses_df):
             #
             anything_else(user, users_df, businesses_df)
 
-        # Allow the user to edit their existing advanced preferences
-        elif choice.upper() == "E":
-            print()
-            valid_choice = True
-            #
-            anything_else(user, users_df, businesses_df)
 
         # Detect invalid inputs or a wish to close the program
         elif choice.upper() != "B":
@@ -160,10 +162,125 @@ def advanced_options(user, users_df, businesses_df):
 
 
 # Allow user to add an advanced preference, these align with disabilities and additional requirements
-def add_preference(preferences):
+def add_preference(preferences, businesses, users, user_id):
     # options:
     # OutdoorSeating, Delivery, Takeout, GoodForKids, WheelchairAccessible, DogsAllowed, Smoking, NoiseLevel, Alcohol,
-    return {}
+    options = {"1": "OutdoorSeating", "2": "Delivery", "3": "RestaurantsTakeOut", "4": "GoodForKids",
+               "5": "WheelchairAccessible", "6": "DogsAllowed", "7": "Smoking", "8": "NoiseLevel", "9": "Alcohol"}
+    print("[1] - Outdoor Seating")
+    print("[2] - Delivery")
+    print("[3] - Takeout")
+    print("[4] - Good for Kids")
+    print("[5] - Wheelchair Accessible")
+    print("[6] - Dogs Allowed")
+    print("[7] - Smoking")
+    print("[8] - Noise Level")
+    print("[9] - Alcohol")
+
+    # Request that they enter one of the options above
+    valid_choice = False
+    while not valid_choice:
+        choice = input("Please enter one of the options above [or C to cancel]: ")
+        if choice.upper() != "C":
+            try:
+                temp = int(choice)
+                if 0 < temp < 10:
+                    valid_choice = True
+                else:
+                    print("INVALID INPUT - Please enter one of the numbers above")
+            except:
+                print("INVALID INPUT - Please enter one of the numbers above")
+                valid_choice = False
+        else:
+            valid_choice = True
+
+    if choice.upper() != "C":
+        # Check to see if user already has a preference for this selection
+        no_change = False
+        if preferences.get(options[choice]) != None:
+            valid = False
+            current_choice = preferences.get(options[choice])
+            while not valid:
+                yn = input("You have already expressed a preference for this (Choice: " + str(current_choice)
+                           + "), do you wish to change it [Y/N]?: ")
+                if yn.upper() == "Y":
+                    valid = True
+                elif yn.upper() == "N":
+                    valid = True
+                    no_change = True
+                else:
+                    print("INVALID INPUT - Please enter [Y] for Yes, or [N] for No")
+
+    if not no_change:
+        # Find the advanced preference they have chosen and then find the available options for that choice
+        if choice.upper() != "C":
+            chosen = options[choice]
+
+            options = []
+            for index, row in businesses.iterrows():
+                try:
+                    attrib_dict = literal_eval(row["attributes"])
+                    try:
+                        row_val = attrib_dict[chosen]
+                        if row_val not in options:
+                            options.append(row_val)
+                    except:
+                        pass
+                except:
+                    pass
+
+            selection = []
+            # Remove old u' strings
+            for item in options:
+                if item.startswith("u'"):
+                    selection.append(item[2:-1])
+                elif item[0] == "'" and item[-1] == "'":
+                    selection.append(item[1:-1])
+                else:
+                    selection.append(item)
+
+            # Remove duplicates
+            selection = list(dict.fromkeys(selection))
+
+            # Print the options to the screen
+            print("The options for this are: ")
+            count = 1
+            for item in selection:
+                print("[" + str(count) + "] - " + item.replace("_", " "))
+                count += 1
+
+            # Allow them to specify one of the options or cancel
+            valid_choice = False
+            while not valid_choice:
+                choice = input("Please enter your selection from above [1-" + str(len(selection))
+                               + "] (or [C] to cancel): ")
+                if choice.upper() != "C":
+                    try:
+                        if int(choice) != 0:
+                            try:
+                                chosen_preference = selection[int(choice)-1]
+                                valid_choice = True
+                            except:
+                                pass
+                    except ValueError:
+                        pass
+                    if not valid_choice:
+                        print("INVALID INPUT")
+                else:
+                    valid_choice = True
+
+            if choice.upper() != "C":
+                # If the preference is already in list of their preferences then change it, otherwise add it
+                preferences[chosen] = chosen_preference
+                print(preferences)
+
+                # Save the new user preferences
+                users.loc[users["user_id"] == user_id, "advanced_preferences"] = str(preferences)
+                users.to_csv("newDFUser.csv", index=0)
+                print("Your preferences have been updated")
+                print()
+
+
 
 
 # Preference: define a minimum number of stars required
