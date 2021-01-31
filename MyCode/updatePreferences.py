@@ -46,7 +46,7 @@ def update_preferences(user_id, users_df, businesses_df):
         elif selection.upper() == "A":
             print()
             valid_choice = True
-            advanced_options(user_id, users_df)
+            advanced_options(user_id, users_df, businesses_df)
 
         elif selection.upper() != "B":
             # Allow the user to exit the program
@@ -98,7 +98,7 @@ def update_review_seen(user, users_df):
 
 
 # Preference: Allow further refinement of businesses to recommend
-def advanced_options(user, users_df):
+def advanced_options(user, users_df, businesses_df):
     # Find the current preferences
     id_search = users_df[users_df["user_id"] == user]
     preferences = id_search['advanced_preferences'].iloc[0]
@@ -114,9 +114,9 @@ def advanced_options(user, users_df):
             print(preference + ": " + str(preferences[preference]))
 
     # Present menu and take valid input of user's choicer
-    print("[A] - Add a preference")
-    print("[D] - Delete a preference")
-    print("[E] - Edit a preference")
+    print("[A] - Add an advanced preference")
+    print("[D] - Delete an advanced preference")
+    print("[E] - Edit an advanced preference")
     print("[B] - Return")
     print("[X] - Exit")
     valid_choice = False
@@ -127,34 +127,43 @@ def advanced_options(user, users_df):
         if choice.upper() == "A":
             print()
             valid_choice = True
-            #
+            preferences = add_preference(preferences)
+            anything_else(user, users_df, businesses_df)
 
         # Allow the user to delete an existing advanced preference
         elif choice.upper() == "D":
             print()
             valid_choice = True
             #
+            anything_else(user, users_df, businesses_df)
 
         # Allow the user to edit their existing advanced preferences
         elif choice.upper() == "E":
             print()
             valid_choice = True
             #
+            anything_else(user, users_df, businesses_df)
 
         # Detect invalid inputs or a wish to close the program
         elif choice.upper() != "B":
             if choice.upper() == "X":
-                print("Closing program")
+                print("Closing program...")
                 valid_choice = True
                 exit()
             else:
                 print("INVALID INPUT - Please select from the options above")
 
-        # Alow the user to return from this section
+        # Allow the user to return from this section
         else:
             valid_choice = True
             print()
 
+
+# Allow user to add an advanced preference, these align with disabilities and additional requirements
+def add_preference(preferences):
+    # options:
+    # OutdoorSeating, Delivery, Takeout, GoodForKids, WheelchairAccessible, DogsAllowed, Smoking, NoiseLevel, Alcohol,
+    return {}
 
 
 # Preference: define a minimum number of stars required
