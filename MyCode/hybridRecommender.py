@@ -174,8 +174,187 @@ def more_details(rank, recommendations, businesses):
             attributes = literal_eval(full_business.iloc[0]["attributes"])
             print("Attributes: ")
             for item in attributes:
-                to_print = "\t" + item + " " + attributes[item]
-                print(to_print)
+                if item == "OutdoorSeating":
+                    if attributes[item] == "True":
+                        print("\t- Has outdoor seating")
+                    else:
+                        print("\t- Does not have outdoor seating")
+                elif item == "HasTV":
+                    if attributes[item] == "True":
+                        print("\t- Has a TV")
+                    else:
+                        print("\t- Does not have a TV")
+                elif item == "RestaurantsGoodForGroups":
+                    if attributes[item] == "True":
+                        print("\t- Good for groups")
+                    else:
+                        print("\t- Not good for groups")
+                elif item == "HappyHour":
+                    if attributes[item] == "True":
+                        print("\t- Has a Happy Hour")
+                    else:
+                        print("\t- Does not have a Happy Hour")
+                elif item == "RestaurantsDelivery":
+                    if attributes[item] == "True":
+                        print("\t- Does delivery")
+                    else:
+                        print("\t- Does not do delivery")
+                elif item == "RestaurantsTakeOut":
+                    if attributes[item] == "True":
+                        print("\t- Does takeout")
+                    else:
+                        print("\t- Does not do takeout")
+                elif item == "GoodForKids":
+                    if attributes[item] == "True":
+                        print("\t- Good for kids")
+                    else:
+                        print("\t- Not Good for kids")
+                elif item == "BikeParking":
+                    if attributes[item] == "True":
+                        print("\t- Has bike parking")
+                    else:
+                        print("\t- Does not have bike parking")
+                elif item == "Caters":
+                    if attributes[item] == "True":
+                        print("\t- Has catering")
+                    else:
+                        print("\t- Does not have catering")
+                elif item == "WheelchairAccessible":
+                    if attributes[item] == "True":
+                        print("\t- Is wheelchair accessible")
+                    else:
+                        print("\t- Is not wheelchair accessible")
+                elif item == "DriveThru":
+                    if attributes[item] == "True":
+                        print("\t- Has a drive-through")
+                    else:
+                        print("\t- Does not have a drive-through")
+                elif item == "CoatCheck":
+                    if attributes[item] == "True":
+                        print("\t- Has coat checking")
+                    else:
+                        print("\t- Does not have coat checking")
+                elif item == "DogsAllowed":
+                    if attributes[item] == "True":
+                        print("\t- Dogs are allowed")
+                    else:
+                        print("\t- Dogs are not allowed")
+                elif item == "RestaurantsPriceRange2":
+                    print("\t- Price Range: " + str(attributes[item]))
+                elif item == "Ambience":
+                    ambience_dict = literal_eval(attributes[item])
+                    descriptors = []
+                    for ambience in ambience_dict:
+                        if ambience_dict[ambience]:
+                            descriptors.append(ambience)
+                    if len(descriptors) != 0:
+                        keywords = ""
+                        for description in descriptors:
+                            keywords += description + " "
+                        print("\t- Ambience: " + keywords)
+                elif item == "Music":
+                    music_dict = literal_eval(attributes[item])
+                    descriptors = []
+                    for music in music_dict:
+                        if music_dict[music]:
+                            descriptors.append(music)
+                    if len(descriptors) != 0:
+                        keywords = ""
+                        for description in descriptors:
+                            keywords += description + " "
+                        print("\t- Music: " + keywords)
+                elif item == "RestaurantsReservations":
+                    if attributes[item] == "True":
+                        print("\t- Allows reservations")
+                    else:
+                        print("\t- Does not allow reservations")
+                elif item == "BusinessAcceptsCreditCards":
+                    if attributes[item] == "True":
+                        print("\t- Accepts credit cards")
+                    else:
+                        print("\t- Does not accept credit cards")
+                elif item == "GoodForDancing":
+                    if attributes[item] == "True":
+                        print("\t- Good for dancing")
+                    else:
+                        print("\t- Not good for dancing")
+                elif item == "RestaurantsTableService":
+                    if attributes[item] == "True":
+                        print("\t- Table Service")
+                    else:
+                        print("\t- No table service")
+                elif item == "ByAppointmentOnly":
+                    if attributes[item] == "False":
+                        print("\t- Appointment Only")
+                elif item == "WiFi":
+                    to_add = attributes[item]
+                    if attributes[item].startswith("u'"):
+                        print("\t- Wifi: " + str(to_add[2:-1]))
+                    else:
+                        print("\t- WiFi: " + to_add)
+                elif item == "Smoking":
+                    to_add = attributes[item]
+                    if attributes[item].startswith("u'"):
+                        print("\t- Smoking: " + str(to_add[2:-1]))
+                    else:
+                        print("\t- Smoking: " + to_add)
+                elif item == "RestaurantsAttire":
+                    to_add = attributes[item]
+                    if attributes[item].startswith("u'"):
+                        print("\t- Restaurant Attire: " + str(to_add[2:-1]))
+                    else:
+                        print("\t- Restaurant Attire: " + to_add)
+                elif item == "NoiseLevel":
+                    to_add = attributes[item]
+                    if attributes[item].startswith("u'"):
+                        print("\t- Noise Level: " + str(to_add[2:-1]))
+                    else:
+                        print("\t- Noise Level: " + to_add)
+                elif item == "Alcohol":
+                    to_add = attributes[item]
+                    to_add = to_add.replace("_", " ")
+                    if attributes[item].startswith("u'"):
+                        print("\t- Alcohol: " + str(to_add[2:-1]))
+                    else:
+                        print("\t- Alcohol: " + to_add)
+                elif item == "GoodForMeal":
+                    meal_dict = literal_eval(attributes[item])
+                    descriptors = []
+                    for meal in meal_dict:
+                        if meal_dict[meal]:
+                            descriptors.append(meal)
+                    if len(descriptors) != 0:
+                        keywords = ""
+                        for description in descriptors:
+                            keywords += description + " "
+                        print("\t- Notably good for meals: " + keywords)
+                elif item == "BestNights":
+                    nights_dict = literal_eval(attributes[item])
+                    descriptors = []
+                    for night in nights_dict:
+                        if nights_dict[night]:
+                            descriptors.append(night)
+                    if len(descriptors) != 0:
+                        keywords = ""
+                        for description in descriptors:
+                            keywords += description + " "
+                        print("\t- Best Nights: " + keywords)
+                elif item == "BusinessParking":
+                    parking_dict = literal_eval(attributes[item])
+                    descriptors = []
+                    for parking_type in parking_dict:
+                        if parking_dict[parking_type]:
+                            descriptors.append(parking_type)
+                    if len(descriptors) != 0:
+                        keywords = ""
+                        for description in descriptors:
+                            keywords += description + " "
+                        print("\t- Business parking options: " + keywords)
+                    else:
+                        print("\t- No business parking available")
+                else:
+                    to_print = "\t- " + item + " " + attributes[item]
+                    print(to_print)
         except:
             print()
 
