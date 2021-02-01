@@ -7,7 +7,7 @@ from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-def recommender_one(user_id):
+def collaborative_recommender(user_id):
 
     # Update the dataframes
     reviews_df = pd.read_csv("newDFReview.csv")

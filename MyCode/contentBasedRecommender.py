@@ -10,7 +10,7 @@ import pandas as pd
 # 4. List of recommendations
 
 
-def recommender_two(user_id):
+def content_based_recommender(user_id):
     # Update the dataframes
     reviews_df = pd.read_csv("newDFReview.csv")
     users_df = pd.read_csv("newDFUser.csv")

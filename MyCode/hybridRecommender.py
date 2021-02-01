@@ -1,6 +1,6 @@
 # imports
-from recommenderOne import *
-from recommenderTwo import *
+from collaborativeRecommender import *
+from contentBasedRecommender import *
 from ast import literal_eval
 
 
@@ -30,7 +30,7 @@ def generate_recommendations(user_id):
         display_results(result, businesses_df, to_display)
     else:
 
-        first_recommendations = recommender_one(user_id)
+        first_recommendations = collaborative_recommender(user_id)
 
         ############
 
@@ -38,7 +38,7 @@ def generate_recommendations(user_id):
 
         ############
 
-        recommender_two(user_id)
+        content_based_recommender(user_id)
 
 
 # Display the results from the recommender
