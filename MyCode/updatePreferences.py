@@ -242,9 +242,9 @@ def add_preference(preferences, businesses, users, user_id):
                 else:
                     print("INVALID INPUT - Please enter [Y] for Yes, or [N] for No")
 
-    if not no_change:
-        # Find the advanced preference they have chosen and then find the available options for that choice
-        if choice.upper() != "C":
+    # Find the advanced preference they have chosen and then find the available options for that choice
+    if choice.upper() != "C":
+        if not no_change:
             chosen = options[choice]
 
             options = []
