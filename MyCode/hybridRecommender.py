@@ -423,9 +423,8 @@ def display_explanation(user, users_df):
             print("\t-" + preference + ": " + str(preferences[preference]))
         print()
     except:
-        if np.isnan(preferences):
-            preferences = {}
-            print("You have not  specified any particular preferences")
+        if np.isnan(advanced_preferences):
+            print("You have not specified any particular preferences")
 
     # Outline the recommendation techniques used
     print("Recommender method used: Hybrid recommender (Collaborative and Content-Based), utilising a Cascade scheme")

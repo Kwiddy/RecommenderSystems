@@ -175,23 +175,26 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
 
     # Remove items based on the user's advanced preferences
     advanced_preferences = id_search['advanced_preferences'].iloc[0]
-    advanced_preferences = literal_eval(advanced_preferences)
-    for item in sorted_predictions:
-        business_search = businesses_df[businesses_df["business_id"] == item[1]]
-        attributes = business_search['attributes'].iloc[0]
+    try:
+        advanced_preferences = literal_eval(advanced_preferences)
+        for item in sorted_predictions:
+            business_search = businesses_df[businesses_df["business_id"] == item[1]]
+            attributes = business_search['attributes'].iloc[0]
 
-        # Leave the businesses with nan values as their attributes
-        try:
-            if math.isnan(attributes):
-                pass
-        except:
-            # Check if each preference is in the business' attributes and if so, make sure it matches otherwise remove
-            attributes = literal_eval(attributes)
-            for preference in advanced_preferences:
-                if preference in attributes:
-                    if attributes[preference] != advanced_preferences[preference]:
-                        sorted_predictions.remove(item)
-                        break
+            # Leave the businesses with nan values as their attributes
+            try:
+                if math.isnan(attributes):
+                    pass
+            except:
+                # Check if each preference is in the business' attributes and if so, make sure it matches otherwise remove
+                attributes = literal_eval(attributes)
+                for preference in advanced_preferences:
+                    if preference in attributes:
+                        if attributes[preference] != advanced_preferences[preference]:
+                            sorted_predictions.remove(item)
+                            break
+    except:
+        pass
 
     # Return the list of sorted predictions
     return sorted_predictions
