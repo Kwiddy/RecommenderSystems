@@ -221,7 +221,7 @@ def main(new_user, existing_user):
         if choice.upper() == "G":
             valid_choice = True
             print()
-            generate_recommendations(i_user_id)
+            generate_recommendations(i_user_id, users_df)
 
         # Add / Amend / View / Delete a Review
         elif choice.upper() == "R":
