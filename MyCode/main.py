@@ -1,5 +1,6 @@
 # imports
 from editReviews import *
+from dataExplanation import *
 from updatePreferences import *
 from hybridRecommender import *
 
@@ -210,6 +211,7 @@ def main(new_user, existing_user):
     print("[R] - Add/Amend/View/Delete a Review")
     print("[P] - Update user preferences")
     print("[L] - Logout and enter another User ID")
+    print("[H] - How we use your data")
     print("[X] - Exit")
 
     # Request a valid input until one is given
@@ -234,6 +236,12 @@ def main(new_user, existing_user):
             valid_choice = True
             print()
             update_preferences(i_user_id, users_df, businesses_df)
+
+        # Take user to a page displaying more information about how their data is used
+        elif choice.upper() == "H":
+            valid_choice = True
+            print()
+            show_data_explanation()
 
         # Logout
         elif choice.upper() == "L":
