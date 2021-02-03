@@ -50,6 +50,7 @@ def generate_recommendations(user_id, users_df):
 def display_results(results, businesses_df, return_num):
     show_more = True
     start = 0
+    end = return_num
     rank = 1
     all_outputs = pd.DataFrame()
     # The show more loop allows the user to continuously display more recommendations
@@ -58,7 +59,7 @@ def display_results(results, businesses_df, return_num):
         first = True
 
         # Display the next n items from the sorted list of recommendations
-        for item in results[start:return_num]:
+        for item in results[start:end]:
             # Format the item for outputting
             last_row = item
             item_id = item[1]
@@ -83,28 +84,29 @@ def display_results(results, businesses_df, return_num):
             # Increment rank
             rank += 1
 
-        # Print the next batch of recommended items
-        print(output)
+        # Print the next batch of recommended items (in such a way that ellipses aren't used and all rows are printed)
+        with pd.option_context('display.max_rows', None):
+            print(output)
 
         # Ensures that the user can only keep displaying more recommendations up until the end of the recommendations
         #       generated.
         postponed_choice = False
         if last_row != results[-1]:
             valid_choice = False
-            print("[M] - Display 8 more recommendations")
+            print("[M] - Display " + str(return_num) + " more recommendations")
             print("[S] - See more details about a recommendation")
             print("[F] - Finish")
             while not valid_choice:
                 yn = input("Please choose from the options above: ")
                 if yn.upper() == "M":
                     valid_choice = True
-                    start += 8
-                    return_num += 8
+                    start += return_num
+                    end += return_num
                 elif yn.upper() == "S":
                     postponed_choice = True
                     more_details(rank, all_outputs, businesses_df)
                     print()
-                    print("[M] - Display 8 more recommendations")
+                    print("[M] - Display " + str(return_num) + " more recommendations")
                     print("[S] - See more details about a recommendation")
                     print("[F] - Finish")
                 elif yn.upper() == "F":
