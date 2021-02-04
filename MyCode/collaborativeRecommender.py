@@ -31,8 +31,11 @@ def collaborative_recommender(user_id):
     weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, businesses_df, users_df,
                                         reviews_df, blacklist)
 
+    # Refine the businesses based on preferences
+    refined_businesses = remove_businesses(weighted_average, user_id, users_df, reviews_df, businesses_df, blacklist)
+
     # Return recommender predictions
-    return weighted_average
+    return refined_businesses
 
 
 # Find the similarity matrix between businesses
@@ -147,6 +150,11 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     # Sort the predictions
     sorted_predictions = sorted(predictions, reverse=True)
 
+    # Return the list of sorted predictions
+    return sorted_predictions
+
+
+def remove_businesses(sorted_predictions, user, users_df, reviews_df, businesses_df, blacklist):
     # remove blacklisted items
     for item in sorted_predictions:
         if item[1] in blacklist:
@@ -196,5 +204,4 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     except:
         pass
 
-    # Return the list of sorted predictions
     return sorted_predictions

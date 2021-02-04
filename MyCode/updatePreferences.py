@@ -342,7 +342,7 @@ def update_min_stars(user, users_df):
 
 # Preference: store a list of blacklisted sites
 def update_blacklist(user_id, users_df, businesses_df):
-    # Retrieve the user's current list of blacklisted sites, stored as a string
+    # Retrieve the user's current list of blacklisted businesses, stored as a string
     id_search = users_df[users_df["user_id"] == user_id]
     blacklist = id_search['blacklist'].iloc[0]
 
