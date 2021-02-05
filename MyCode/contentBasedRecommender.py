@@ -16,6 +16,8 @@ def content_based_recommender(user_id):
     users_df = pd.read_csv("newDFUser.csv")
     businesses_df = pd.read_csv("newDFBusiness.csv")
 
+    return temporary_recommender(businesses_df)
+
     # Content analyser - Represent items' content in a structured form
     analysis = content_analyser(user_id, users_df, businesses_df, reviews_df)
 
@@ -29,3 +31,13 @@ def content_based_recommender(user_id):
 
 def content_analyser(user_id, users_df, businesses_df, reviews_df):
     return "hi"
+
+
+def temporary_recommender(businesses_df):
+    rank = 1
+    temp_rankings = []
+    for index, row in businesses_df.iterrows():
+        temp_rankings.append([rank, row["business_id"]])
+        rank += 1
+    temp_rankings = sorted(temp_rankings, reverse=True)
+    return temp_rankings
