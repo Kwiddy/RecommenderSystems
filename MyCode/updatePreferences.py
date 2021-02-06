@@ -326,7 +326,7 @@ def update_min_stars(user, users_df):
             try:
                 if int(choice) in range(1, 6):
                     valid_input = True
-                    choice = int(choice)
+                    temp = int(choice)
             except ValueError:
                 print("INVALID INPUT")
                 valid_input = False

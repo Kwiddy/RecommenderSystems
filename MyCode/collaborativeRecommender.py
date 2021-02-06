@@ -14,12 +14,6 @@ def collaborative_recommender(user_id):
     users_df = pd.read_csv("newDFUser.csv")
     businesses_df = pd.read_csv("newDFBusiness.csv")
 
-    # find the similarity matrix between all businesses and store locations for later use
-    similarity_matrix, indices = find_similarities(businesses_df)
-
-    # Find all businesses reviewed by the user
-    rated_items = find_user_rated(user_id, reviews_df)
-
     # Find blacklisted items
     id_search = users_df[users_df["user_id"] == user_id]
     blacklist_str = id_search['blacklist'].iloc[0]
@@ -27,15 +21,29 @@ def collaborative_recommender(user_id):
     if not pd.isna(blacklist_str):
         blacklist = blacklist_str.split(",")
 
+    # Get a list of all business_ids
+    business_ids = []
+    for index, row in businesses_df.iterrows():
+        business_ids.append(row["business_id"])
+
+    # Pre-processing: Refine the businesses based on preference criteria
+    refined_businesses = remove_businesses(business_ids, user_id, users_df, reviews_df, businesses_df, blacklist)
+
+    # find the similarity matrix between all businesses and store locations for later use
+    similarity_matrix, indices = find_similarities(businesses_df)
+
+    # Find all businesses reviewed by the user
+    rated_items = find_user_rated(user_id, reviews_df)
+
     # Find the predictions for each item and find the items to be recommended
     weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, businesses_df, users_df,
-                                        reviews_df, blacklist)
+                                        reviews_df, refined_businesses)
 
-    # Refine the businesses based on preferences
-    refined_businesses = remove_businesses(weighted_average, user_id, users_df, reviews_df, businesses_df, blacklist)
+    # # Refine the businesses based on preferences
+    # refined_businesses = remove_businesses(weighted_average, user_id, users_df, reviews_df, businesses_df, blacklist)
 
     # Return recommender predictions
-    return refined_businesses
+    return weighted_average
 
 
 # Find the similarity matrix between businesses
@@ -76,7 +84,7 @@ def make_comparable(items_row):
 
 
 # Calculate predictions for each item and find the items to be recommended
-def find_predictions(matrix, user, rated, business_index, businesses_df, users_df, reviews_df, blacklist):
+def find_predictions(matrix, user, rated, business_index, businesses_df, users_df, reviews_df, refined_businesses):
     # Find the location of the reviewed items in the similarity matrix
     n_final_similarities = []
     d_final_similarities = []
@@ -153,25 +161,32 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     # Sort the predictions
     sorted_predictions = sorted(predictions, reverse=True)
 
+    # Refine the predictions by the accepted businesses
+    new_sorted = []
+    for prediction in sorted_predictions:
+        id_search = refined_businesses[refined_businesses["business_id"] == prediction[1]]
+        if len(id_search) == 1:
+            new_sorted.append(prediction)
+
     # Return the list of sorted predictions
-    return sorted_predictions
+    return new_sorted
 
 
-def remove_businesses(sorted_predictions, user, users_df, reviews_df, businesses_df, blacklist):
+def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, blacklist):
     # remove blacklisted items
-    for item in sorted_predictions:
-        if item[1] in blacklist:
-            sorted_predictions.remove(item)
+    for item in business_ids:
+        if item in blacklist:
+            business_ids.remove(item)
 
     # remove items with a below minimum number of stars (from preferences)
     id_search = users_df[users_df["user_id"] == user]
     min_stars = id_search['min_stars'].iloc[0]
-    for item in sorted_predictions:
-        business_search = businesses_df[businesses_df["business_id"] == item[1]]
+    for item in business_ids:
+        business_search = businesses_df[businesses_df["business_id"] == item]
         num_stars = business_search['stars'].iloc[0]
         num_stars = int(num_stars)
         if num_stars < int(min_stars):
-            sorted_predictions.remove(item)
+            business_ids.remove(item)
 
     # If the user has chosen not to recommend previously reviewed items then remove them from the predictions
     prev_seen_pref = id_search['recommend_seen'].iloc[0]
@@ -180,16 +195,16 @@ def remove_businesses(sorted_predictions, user, users_df, reviews_df, businesses
         user_reviews = reviews_df[reviews_df["user_id"] == user]
         for index, row in user_reviews.iterrows():
             to_remove.append(row["business_id"])
-        for item in sorted_predictions:
-            if item[1] in to_remove:
-                sorted_predictions.remove(item)
+        for item in business_ids:
+            if item in to_remove:
+                business_ids.remove(item)
 
     # Remove items based on the user's advanced preferences
     advanced_preferences = id_search['advanced_preferences'].iloc[0]
     try:
         advanced_preferences = literal_eval(advanced_preferences)
-        for item in sorted_predictions:
-            business_search = businesses_df[businesses_df["business_id"] == item[1]]
+        for item in business_ids:
+            business_search = businesses_df[businesses_df["business_id"] == item]
             attributes = business_search['attributes'].iloc[0]
 
             # Leave the businesses with nan values as their attributes
@@ -197,14 +212,20 @@ def remove_businesses(sorted_predictions, user, users_df, reviews_df, businesses
                 if math.isnan(attributes):
                     pass
             except:
-                # Check if each preference is in the business' attributes and if so, make sure it matches otherwise remove
+                # Check if each preference is in the business' attributes and if so, make sure it matches otherwise
+                #   remove
                 attributes = literal_eval(attributes)
                 for preference in advanced_preferences:
                     if preference in attributes:
                         if attributes[preference] != advanced_preferences[preference]:
-                            sorted_predictions.remove(item)
+                            business_ids.remove(item)
                             break
     except:
         pass
 
-    return sorted_predictions
+    # Generate the dataframe of refined businesses
+    refined_businesses = businesses_df.copy()
+    refined_businesses = refined_businesses[refined_businesses["business_id"].isin(business_ids)]
+
+    return refined_businesses
+
