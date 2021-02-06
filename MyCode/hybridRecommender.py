@@ -69,6 +69,9 @@ def cascade_scheme(first_recs, second_recs):
             if matching:
                 end_pos = i
 
+                # Store the shared identical value
+                shared_value = temp[0][0]
+
                 # sort the list of matching recommendations
                 second_score_added = []
                 for item in temp:
@@ -80,6 +83,17 @@ def cascade_scheme(first_recs, second_recs):
 
                 # Sort the newly scored temporary list
                 second_score_added = sorted(second_score_added, reverse=True)
+
+                # Replace the second_score list with equidistant values within a range from the original
+                # Range of 0.01 so as to not affect rankings with regards to recommendations with different values from
+                # first recommender
+                interval = 0.01 / len(second_score_added)
+                current = shared_value + 0.01
+                i = 0
+                while i < len(second_score_added):
+                    second_score_added[i][0] = current - interval
+                    current -= interval
+                    i += 1
 
                 # Replace the set of matching recommendations with the newly sorted ones
                 i = start_pos
@@ -94,22 +108,38 @@ def cascade_scheme(first_recs, second_recs):
         i += 1
 
     # Edge case for when the last values have identical values, need to empty temp
-    second_score_added = []
-    for item in temp:
-        for second in second_recs:
-            if second[1] == item[1]:
-                second_score = second[0]
-                break
-        second_score_added.append([item[0] + second_score, item[1]])
+    if len(temp) != 0:
 
-    # Sort the newly scored temporary list
-    second_score_added = sorted(second_score_added, reverse=True)
+        # Store the shared identical value
+        shared_value = temp[0][0]
 
-    # Replace the set of matching recommendations with the newly sorted ones
-    i = start_pos
-    while i < len(final_recs):
-        final_recs[i] = second_score_added[i - start_pos]
-        i += 1
+        second_score_added = []
+        for item in temp:
+            for second in second_recs:
+                if second[1] == item[1]:
+                    second_score = second[0]
+                    break
+            second_score_added.append([item[0] + second_score, item[1]])
+
+        # Sort the newly scored temporary list
+        second_score_added = sorted(second_score_added, reverse=True)
+
+        # Replace the second_score list with equidistant values within a range from the original
+        # Range of 0.01 so as to not affect rankings with regards to recommendations with different values from first
+        #   recommender
+        interval = 0.01 / len(second_score_added)
+        current = shared_value + 0.01
+        i = 0
+        while i < len(second_score_added):
+            second_score_added[i][0] = current - interval
+            current -= interval
+            i += 1
+
+        # Replace the set of matching recommendations with the newly sorted ones
+        i = start_pos
+        while i < len(final_recs):
+            final_recs[i] = second_score_added[i - start_pos]
+            i += 1
 
     return final_recs
 

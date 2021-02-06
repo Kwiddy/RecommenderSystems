@@ -144,7 +144,10 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     for i in range(len(numerators)):
         n = numerators[i][0]
         d = denominators[i][0]
-        result = n/d
+
+        # Round the result to 2dp for reasons explained in the report
+        result = round(n/d, 2)
+
         predictions.append([result, numerators[i][1]])
 
     # Sort the predictions
