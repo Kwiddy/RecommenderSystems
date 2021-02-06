@@ -50,19 +50,33 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
-ds = pd.read_csv("newDFBusiness.csv")
+businesses_df = pd.read_csv("newDFBusiness.csv")
 
 tf = TfidfVectorizer(analyzer='word', ngram_range=(1, 3), min_df=0, stop_words='english')
-tfidf_matrix = tf.fit_transform(ds['categories'])
+tfidf_matrix = tf.fit_transform(businesses_df['categories'])
 
 cosine_similarities = linear_kernel(tfidf_matrix, tfidf_matrix)
 
 results = {}
 
-for idx, row in ds.iterrows():
-    similar_indices = cosine_similarities[idx].argsort()[:-100:-1]
-    similar_items = [[cosine_similarities[idx][i], ds['business_id'][i]] for i in similar_indices]
+for index, row in businesses_df.iterrows():
+    similar_indices = cosine_similarities[index].argsort()[:-100:-1]
+    similar_items = [[cosine_similarities[index][i], businesses_df['business_id'][i]] for i in similar_indices]
 
     results[row['business_id']] = similar_items[1:]
 
 print(results)
+
+
+def item(id):
+    return businesses_df.loc[businesses_df['business_id'] == id]['business_id'].tolist()[0].split(' - ')[0]
+
+def recommend(item_id, num):
+    print("Recommending " + str(num) + " products similar to " + item(item_id) + "...")
+    print("-------")
+    recs = results[item_id][:num]
+    for rec in recs:
+        print("Recommended: " + item(rec[1]) + " (score:" + str(rec[0]) + ")")
+
+
+recommend(item_id="ZpPOiNYi4AHNneI7uco7GQ", num=5)
