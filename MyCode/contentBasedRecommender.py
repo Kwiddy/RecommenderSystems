@@ -50,7 +50,6 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
-
 def content_based_recommender(reviewed_items, refined_businesses):
 
     # TF-IDF algorithm, weights the importance of keywords based on frequency, higher weight = rarer and more important
@@ -68,12 +67,23 @@ def content_based_recommender(reviewed_items, refined_businesses):
 
         results[row['business_id']] = similar_items[1:]
 
-    # print(results)
-    # for key, value in results.items():
-    #     print(key, value)
-    # print(type(results))
+    # Sum the similarities to all previously reviewed items to find most similar businesses to the user profile
+    combined_results = []
     for business_id in reviewed_items:
-        print(business_id)
-        print(results[business_id])
+        if len(combined_results) == 0:
+            combined_results = results[business_id]
+            print(combined_results)
+        else:
+            for result in results[business_id]:
+                i = 0
+                while i < len(combined_results):
+                    if combined_results[i][1] == result[1]:
+                        combined_results[i][0] += result[0]
+                        break
+                    i += 1
+
+    # Sort the new list of combined results
+    combined_results = sorted(combined_results, reverse=True)
+    print(combined_results)
     exit()
 
