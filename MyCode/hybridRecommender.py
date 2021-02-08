@@ -35,9 +35,16 @@ def generate_recommendations(user_id, users_df):
         display_results(result, businesses_df, to_display)
     else:
 
-        # Generate Recommendations
-        first_recommendations = collaborative_recommender(user_id)
-        second_recommendations = content_based_recommender(user_id)
+        # Generate Collaborative Recommendations
+        first_recommendations, refined_businesses = collaborative_recommender(user_id)
+
+        # Generate Content-Based recommendations using previous reviews
+        reviewed_ids = []
+        user_reviews = reviews_df[reviews_df["user_id"] == user_id]
+        for index, row in user_reviews.iterrows():
+            reviewed_ids.append(row["business_id"])
+        second_recommendations = content_based_recommender(reviewed_ids, refined_businesses)
+        # second_recommendations = content_based_recommender("ZpPOiNYi4AHNneI7uco7GQ")
 
         # Apply a cascade scheme to join the two recommender systems
         final_recommendations = cascade_scheme(first_recommendations, second_recommendations)

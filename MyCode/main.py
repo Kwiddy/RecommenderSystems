@@ -33,9 +33,9 @@ def select_user(user_df):
         if input_own_choice.upper() == "S":
             print()
             valid_choice = True
-            print("[A] - fkLVpxbHNmeqgIl7O4GztA (Reviews: 6)")
-            print("[B] - deB6EXuanGiN1tkSASuh3A (Reviews: 5)")
-            print("[C] - Kj9cFO70zZOQorN0mgeLWA (Reviews: 3)")
+            print("[A] - fkLVpxbHNmeqgIl7O4GztA (Reviews: 5)")
+            print("[B] - deB6EXuanGiN1tkSASuh3A (Reviews: 4)")
+            print("[C] - Kj9cFO70zZOQorN0mgeLWA (Reviews: 1)")
             print("[X] - Exit")
 
             # Repeat request for input until a valid input is given

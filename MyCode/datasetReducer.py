@@ -29,7 +29,7 @@ def refine_business(category, city):
 # Refine the reviews dataframe by timeframe and if they are relevant to the refined businesses
 def refine_review(timeframe):
     tempdf = dfReview[dfReview['date'].str.contains(timeframe)]
-    rdf = tempdf[tempdf["business_id"].isin(newDFBusiness["business_id"])]
+    rdf = tempdf[tempdf["business_id"].isin(newDFBusiness2["business_id"])]
     return rdf
 
 

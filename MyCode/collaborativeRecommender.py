@@ -43,7 +43,7 @@ def collaborative_recommender(user_id):
     # refined_businesses = remove_businesses(weighted_average, user_id, users_df, reviews_df, businesses_df, blacklist)
 
     # Return recommender predictions
-    return weighted_average
+    return weighted_average, refined_businesses
 
 
 # Find the similarity matrix between businesses
