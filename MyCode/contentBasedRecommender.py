@@ -84,6 +84,4 @@ def content_based_recommender(reviewed_items, refined_businesses):
 
     # Sort the new list of combined results
     combined_results = sorted(combined_results, reverse=True)
-    print(combined_results)
-    exit()
-
+    return combined_results
