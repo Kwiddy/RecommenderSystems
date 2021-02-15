@@ -15,7 +15,7 @@ def content_based_recommender(reviewed_items, refined_businesses):
     # Calculate the relevance of one item to another
     # The following block of code (next 7 lines) have been adapted from:
     #   https://github.com/nikitaa30/Content-based-Recommender-System/blob/master/recommender_system.py
-    tfidf_matrix = TfidfVectorizer(ngram_range=(3, 14), stop_words='english').fit_transform(similarity_measure)
+    tfidf_matrix = TfidfVectorizer(ngram_range=(1, 2), stop_words='english').fit_transform(similarity_measure)
     cosine_similarities = linear_kernel(tfidf_matrix, tfidf_matrix)
     results = {}
     for index, row in refined_businesses.iterrows():
