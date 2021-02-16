@@ -285,6 +285,7 @@ def anything_else(user_id, businesses, reviews, users):
 
 def display_reviews(user):
     reviews = pd.read_csv("newDFReview.csv")
+    businesses = pd.read_csv("newDFBusiness.csv")
     print()
     print("[M] - Display all of my reviews")
     print("[U] - Search for reviews by user")
@@ -329,12 +330,11 @@ def display_reviews(user):
             valid_business = False
             while not valid_business:
                 print()
-                chosen_business = input("Please enter a business ID (or [X] to exit): ")
+                chosen_business = input("Please enter a business ID / name (or [X] to exit): ")
                 if chosen_business.upper() != "X":
+                    # Try business_id first
                     business_reviews = reviews[reviews["business_id"] == chosen_business]
-                    if len(business_reviews) == 0:
-                        print("Invalid business ID / This business has no valid reviews (must be in valid timeframe)")
-                    else:
+                    if len(business_reviews) != 0:
                         valid_business = True
                         # business_reviews = business_reviews.set_index("review_id")
                         print(business_reviews)
@@ -342,6 +342,38 @@ def display_reviews(user):
                         for index, row in business_reviews.iterrows():
                             temp.append(row["review_id"])
                         rate_review(temp)
+                    else:
+                        # Try searching by business name second
+                        possible_businesses = businesses[businesses["name"] == chosen_business]
+                        if len(possible_businesses) != 0:
+
+
+
+                            valid = False
+                            while not valid:
+                                print()
+                                print(possible_businesses)
+                                chosen_business = input("Please enter one of the IDs above (or [X] to exit): ")
+                                if chosen_business.upper() != "X":
+                                    business_reviews = reviews[reviews["business_id"] == chosen_business]
+                                    if len(business_reviews) == 0:
+                                        print(
+                                            "Invalid Business ID / This user has left no valid reviews (valid "
+                                            "reviews must be in valid timeframe)")
+                                    else:
+                                        valid = True
+                                        # user_reviews = user_reviews.set_index("review_id")
+                                        print(business_reviews)
+                                        temp = []
+                                        for index, row in business_reviews.iterrows():
+                                            temp.append(row["review_id"])
+                                        rate_review(temp)
+                                else:
+                                    valid = True
+
+
+                        else:
+                            print("Invalid business ID / This business has no valid reviews (must be in valid timeframe)")
                 else:
                     valid_business = True
             display_reviews(user)
