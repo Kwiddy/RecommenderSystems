@@ -13,6 +13,7 @@ def collaborative_recommender(user_id):
     reviews_df = pd.read_csv("newDFReview.csv")
     users_df = pd.read_csv("newDFUser.csv")
     businesses_df = pd.read_csv("newDFBusiness.csv")
+    covid_df = pd.read_csv("newDFCovid.csv")
 
     # Find blacklisted items
     id_search = users_df[users_df["user_id"] == user_id]
@@ -27,7 +28,8 @@ def collaborative_recommender(user_id):
         business_ids.append(row["business_id"])
 
     # Pre-processing: Refine the businesses based on preference criteria
-    refined_businesses = remove_businesses(business_ids, user_id, users_df, reviews_df, businesses_df, blacklist)
+    refined_businesses = remove_businesses(business_ids, user_id, users_df, reviews_df, businesses_df, covid_df,
+                                           blacklist)
 
     # find the similarity matrix between all businesses and store locations for later use
     similarity_matrix, indices = find_similarities(businesses_df)
@@ -171,7 +173,7 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     return new_sorted
 
 
-def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, blacklist):
+def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, covid_df, blacklist):
     # remove blacklisted items
     for item in business_ids:
         if item in blacklist:
@@ -186,6 +188,30 @@ def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, b
         num_stars = int(num_stars)
         if num_stars < int(min_stars):
             business_ids.remove(item)
+
+    # If the user has chosen not to recommend items which are temporarily closed due to covid
+    item_search = id_search['covid_temp_closed'].iloc[0]
+    if item_search == "Y":
+        i = 0
+        while i < len(business_ids):
+            business_search = covid_df[covid_df["business_id"] == business_ids[i]]
+            is_open = business_search['Temporary Closed Until'].iloc[0]
+            if is_open != "FALSE":
+                business_ids.remove(business_ids[i])
+            else:
+                i += 1
+
+    # If the user has chosen to only recommen businesses which offer delivery or takeout during covid
+    item_search = id_search['covid_d_t'].iloc[0]
+    if item_search == "Y":
+        i = 0
+        while i < len(business_ids):
+            business_search = covid_df[covid_df["business_id"] == business_ids[i]]
+            dort = business_search['delivery or takeout'].iloc[0]
+            if not dort:
+                business_ids.remove(business_ids[i])
+            else:
+                i += 1
 
     # If the user has chosen not to recommend previously reviewed items then remove them from the predictions
     prev_seen_pref = id_search['recommend_seen'].iloc[0]

@@ -11,6 +11,7 @@ def update_preferences(user_id, users_df, businesses_df):
     print("[S] - Choose a minimum number of stars for recommendations")
     print("[U] - Update blacklisted sites")
     print("[R] - Recommend previously reviewed items or not")
+    print("[C] - Covid preferences")
     print("[A] - Advanced Recommender Preferences")
     print("[B] - Return")
     print("[X] - Exit")
@@ -42,6 +43,12 @@ def update_preferences(user_id, users_df, businesses_df):
             valid_choice = True
             update_min_stars(user_id, users_df)
 
+        # Allow the user to define COVID related preferences
+        elif selection.upper() == "C":
+            print()
+            valid_choice = True
+            update_covid_pref(user_id, users_df)
+
         # Allow the users to refine the recommendations further, e.g. by wheelchair access
         elif selection.upper() == "A":
             print()
@@ -63,6 +70,103 @@ def update_preferences(user_id, users_df, businesses_df):
             valid_choice = True
     print()
 
+
+# Preference: Allow the user to define COVID-related preferences for recommendations
+def update_covid_pref(user, users_df):
+    # Display Covid preferences menu and repeat request until a valid input is given
+    print("[T] - Preference for only recommending places that offer takeout or delivery")
+    print("[C] - Preference for only recommending places that are not temporarily closed")
+    print("[B] - Return")
+    print("[X] - Exit")
+    valid_choice = False
+    while not valid_choice:
+        selection = input("Please enter one of the options above: ")
+
+        # Preference for only recommending places that offer takeout or delivery
+        if selection.upper() == "T":
+            print()
+            valid_choice = True
+
+            # Find the current preference (default: Yes (Yes, they do wish reviewed items to be recommended))
+            id_search = users_df[users_df["user_id"] == user]
+            current_status = id_search['covid_d_t'].iloc[0]
+
+            # Convert to text so easier for user to understand
+            if current_status == "Y":
+                current_status = "YES"
+            else:
+                current_status = "NO"
+
+            # Allow user to make choice
+            valid_input = False
+            while not valid_input:
+                yn = input(
+                    "Would you like only places which offer takeout or delivery during COVID to be recommended to you "
+                    "if they are suitable? [Y/N or C to cancel] (Currently " + current_status + "): ")
+                if yn.upper() == "Y":
+                    valid_input = True
+                    users_df.loc[users_df["user_id"] == user, "covid_d_t"] = yn.upper()
+                    print("Preference has been changed to: YES")
+                    users_df.to_csv("newDFUser.csv", index=0)
+                elif yn.upper() == "N":
+                    valid_input = True
+                    users_df.loc[users_df["user_id"] == user, "covid_d_t"] = yn.upper()
+                    print("Preference has been changed to: NO")
+                    users_df.to_csv("newDFUser.csv", index=0)
+                elif yn.upper() == "C":
+                    valid_input = True
+                else:
+                    print("INVALID INPUT")
+
+        # Preference for only recommending places that are not temporarily closed
+        elif selection.upper() == "C":
+            print()
+            valid_choice = True
+            # Find the current preference (default: Yes (Yes, they do wish reviewed items to be recommended))
+            id_search = users_df[users_df["user_id"] == user]
+            current_status = id_search['covid_temp_closed'].iloc[0]
+
+            # Convert to text so easier for user to understand
+            if current_status == "Y":
+                current_status = "YES"
+            else:
+                current_status = "NO"
+
+            # Allow user to make choice
+            valid_input = False
+            while not valid_input:
+                yn = input(
+                    "Would you like only places which are not temporarily closed during COVID to be recommended to you "
+                    "if they are suitable? [Y/N or C to cancel] (Currently " + current_status + "): ")
+                if yn.upper() == "Y":
+                    valid_input = True
+                    users_df.loc[users_df["user_id"] == user, "covid_temp_closed"] = yn.upper()
+                    print("Preference has been changed to: YES")
+                    users_df.to_csv("newDFUser.csv", index=0)
+                elif yn.upper() == "N":
+                    valid_input = True
+                    users_df.loc[users_df["user_id"] == user, "covid_temp_closed"] = yn.upper()
+                    print("Preference has been changed to: NO")
+                    users_df.to_csv("newDFUser.csv", index=0)
+                elif yn.upper() == "C":
+                    valid_input = True
+                else:
+                    print("INVALID INPUT")
+
+        elif selection.upper() != "B":
+            # Allow the user to exit the program
+            if selection.upper() == "X":
+                valid_choice = True
+                exit()
+
+            # Otherwise display an error message
+            else:
+                print("INVALID INPUT")
+
+        # Allow the user to return to the main menu
+        else:
+            valid_choice = True
+    print()
 
 # Preference: Define if they wish to have items recommended which they've already reviewed
 def update_review_seen(user, users_df):

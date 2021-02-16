@@ -67,12 +67,18 @@ def refine_users():
     # Add a column for minimum number of stars
     rdf["min_stars"] = 1
 
-    # Add a column for preference of recommending already reviewed businesses (default No (do not recommend seen items))
+    # Add a column for preference of recommending already reviewed businesses (Default No (do not recommend seen items))
     rdf["recommend_seen"] = "N"
 
     # Add a column, later to contain a string-dictionary, where further preferences are contained such as requiring
     #   wheelchair access
     rdf["advanced_preferences"] = ""
+
+    # Add a column for if the user wishes only for businesses which are not "Temporarily closed until" (Default: No)
+    rdf["covid_temp_closed"] = "N"
+
+    # Add a column for user requiring businesses during COVID to offer either delivery or takeout (Default: No)
+    rdf["covid_d_t"] = "N"
 
     return rdf
 

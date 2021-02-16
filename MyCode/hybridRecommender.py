@@ -255,9 +255,10 @@ def add_covid(result, covid_df):
         combined["COVID Information"] = covid_output
     else:
         d_or_t = str(id_search['delivery or takeout'].iloc[0])
-        if d_or_t == "FALSE":
+        if d_or_t == "False":
             combined["COVID Information"] = "No delivery or takeout"
         else:
+            name = str(result['name'].iloc[0])
             combined["COVID Information"] = "Offers delivery or takeout"
 
     # Ensure that the full cell is displayed - would normally truncate any covid banner
