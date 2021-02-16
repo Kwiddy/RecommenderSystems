@@ -172,7 +172,6 @@ def display_results(results, businesses_df, return_num, no_reviews, covid_df):
             result = businesses_df.loc[businesses_df["business_id"] == item_id].copy()
             result["Prediction"] = item[0]
             result["Result Rank"] = rank
-            result = result.set_index("Result Rank")
 
             # Remove unnecessary columns
             result = result.drop(columns=["latitude", "longitude", "state", "city", "stars", "hours",
@@ -181,7 +180,9 @@ def display_results(results, businesses_df, return_num, no_reviews, covid_df):
             # Add a covid column to the result for outputting
             result = add_covid(result, covid_df)
 
+            # Change index
             result = result.drop(columns=["business_id"])
+            result = result.set_index("Result Rank")
 
             # Add the item to the output
             if first:
@@ -239,28 +240,26 @@ def display_results(results, businesses_df, return_num, no_reviews, covid_df):
 
 # Add COVID data to the result outputting
 def add_covid(result, covid_df):
+    # Create a new temporary dataframe to return the COVID-combined results
+    combined = result.copy()
+
     # Merge data from covid dataframe
     id_search = covid_df[covid_df["business_id"].isin(result["business_id"])]#.set_index("business_id")
 
     # Present different covid data based on what is the most useful for that business
     # If there is a temporary closing time or a covid banner, display them. Otherwise, show delivery or takeout options
     if (id_search["Temporary Closed Until"].any() != "FALSE") or (id_search["Covid Banner"].any() != "FALSE"):
-        covid_output = str(id_search['Covid Banner'].iloc[0]) + ". " + "Closed until: " + \
-                       str(id_search['Temporary Closed Until'].iloc[0])
-        id_search["COVID Information"] = covid_output
+        covid_output = str(id_search['Covid Banner'].iloc[0])
+        combined["COVID Information"] = covid_output
     else:
         d_or_t = str(id_search['delivery or takeout'].iloc[0])
         if d_or_t == "FALSE":
-            id_search["COVID information"] = "No delivery or takeout"
+            combined["COVID Information"] = "No delivery or takeout"
         else:
-            id_search["COVID information"] = "Offers delivery or takeout"
+            combined["COVID Information"] = "Offers delivery or takeout"
 
-    # result = result.set_index("business_id")
-    combined = pd.merge(result, id_search, on="business_id")
-
-    combined = combined.drop(columns=["Grubhub enabled", "Call To Action enabled", "Request a Quote Enabled",
-                                      "Virtual Services Offered", "highlights", "Temporary Closed Until",
-                                      "Covid Banner", "delivery or takeout"])
+    # Ensure that the full cell is displayed - would normally truncate any covid banner
+    pd.set_option('display.max_colwidth', None)
 
     # exit()
     return combined
