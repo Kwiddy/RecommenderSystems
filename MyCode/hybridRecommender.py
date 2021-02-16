@@ -170,7 +170,6 @@ def display_results(results, businesses_df, return_num, no_reviews, covid_df):
             last_row = item
             item_id = item[1]
             result = businesses_df.loc[businesses_df["business_id"] == item_id].copy()
-            result["Prediction"] = item[0]
             result["Result Rank"] = rank
 
             # Remove unnecessary columns
@@ -183,6 +182,9 @@ def display_results(results, businesses_df, return_num, no_reviews, covid_df):
             # Change index
             result = result.drop(columns=["business_id"])
             result = result.set_index("Result Rank")
+
+            # Add prediction
+            result["Prediction"] = item[0]
 
             # Add the item to the output
             if first:
