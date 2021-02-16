@@ -37,7 +37,9 @@ def refine_review(timeframe):
 # Refine the businesses by the provided COVID data
 def refine_covid():
     rdf = dfCovid[dfCovid["business_id"].isin(newDFBusiness["business_id"])]
-    rdf = rdf[rdf['delivery or takeout'].str.contains("TRUE")]
+
+    # Use line below if you wish to restrict the COVID data further, changed since reading an FAQ post
+    # rdf = rdf[rdf['delivery or takeout'].str.contains("TRUE")]
     return rdf
 
 
@@ -105,6 +107,6 @@ print("refined users")
 
 # Save the new datasets to new files which can then be accessed by the recommender system
 newDFBusiness2.to_csv("newDFBusiness.csv", index=0)
-newDFCovid.to_csv("newDFCovid.csv")
+newDFCovid.to_csv("newDFCovid.csv", index=0)
 newDFReview.to_csv("newDFReview.csv", index=0)
 newDFUser.to_csv("newDFUser.csv", index=0)
