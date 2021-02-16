@@ -262,7 +262,7 @@ def add_covid(result, covid_df):
             combined["COVID Information"] = "Offers delivery or takeout"
 
     # Ensure that the full cell is displayed - would normally truncate any covid banner
-    pd.set_option('display.max_colwidth', None)
+    pd.set_option('display.max_colwidth', 50)
 
     # exit()
     return combined
