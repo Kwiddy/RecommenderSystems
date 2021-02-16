@@ -43,7 +43,7 @@ def generate_recommendations(user_id, users_df):
         user_reviews = reviews_df[reviews_df["user_id"] == user_id]
         for index, row in user_reviews.iterrows():
             reviewed_ids.append(row["business_id"])
-        second_recommendations = content_based_recommender(reviewed_ids, refined_businesses)
+        second_recommendations = content_based_recommender(reviewed_ids, refined_businesses, user_id)
 
         # Apply a cascade scheme to join the two recommender systems
         final_recommendations = cascade_scheme(first_recommendations, second_recommendations)

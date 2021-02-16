@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 
-def content_based_recommender(reviewed_items, refined_businesses):
+def content_based_recommender(reviewed_items, refined_businesses, user):
     refined_businesses = pd.read_csv("newDFBusiness.csv")
     similarity_measure = refined_businesses['categories']
     # TF-IDF algorithm, weights the importance of keywords based on frequency, higher weight = rarer and more important
@@ -27,20 +27,31 @@ def content_based_recommender(reviewed_items, refined_businesses):
         similar_items = [[cosine_similarities[index][i], refined_businesses['business_id'][i]] for i in similar_indices]
         results[row['business_id']] = similar_items[1:]
 
-    # Sum the similarities to all previously reviewed items to find most similar businesses to the user profile
+    # Sum the similarities to all previously reviewed items (multiplied by the rating of that review)
+    #   to find most similar businesses to the user profile
     combined_results = []
+    reviews = pd.read_csv("newDFReview.csv")
+    user_reviews = reviews[reviews["user_id"] == user]
+    ratings = {}
+    for index, row in user_reviews.iterrows():
+        ratings[row["business_id"]] = row["stars"]
+
     for business_id in reviewed_items:
         if len(combined_results) == 0:
-            combined_results = results[business_id]
+            for result in results[business_id]:
+                to_add = [result[0] * ratings[business_id], result[1]]
+                combined_results.append(to_add)
+            # combined_results = results[business_id]
         else:
             for result in results[business_id]:
                 i = 0
                 while i < len(combined_results):
                     if combined_results[i][1] == result[1]:
-                        combined_results[i][0] += result[0]
+                        combined_results[i][0] += result[0]*ratings[business_id]
                         break
                     i += 1
 
     # Sort the new list of combined results
     combined_results = sorted(combined_results, reverse=True)
+
     return combined_results
