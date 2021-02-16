@@ -11,7 +11,7 @@ def edit_reviews(user_id, businesses, reviews, users):
 
     # Give the option to Add, Amend, Delete
     print("[N] - Add a new review")
-    print("[V] - View Reviews")
+    print("[V] - View and Rate Reviews")
     print("[A] - Amend an existing review")
     print("[D] - Delete an existing review")
     print("[B] - Back")
@@ -37,7 +37,7 @@ def edit_reviews(user_id, businesses, reviews, users):
 
         elif choice.upper() == "V":
             valid_choice = True
-            display_reviews(user_id, reviews)
+            display_reviews(user_id)
 
         elif choice.upper() == "B":
             valid_choice = True
@@ -145,7 +145,7 @@ def delete_review(user_id, reviews, businesses, users):
         choice = input("Please select from the options above: ")
         if choice.upper() == "S":
             valid_choice = True
-            display_reviews(user_id, reviews)
+            display_reviews(user_id)
             valid_choice_2 = False
             while not valid_choice_2:
                 chosen_id = input("Please enter ID of review to be deleted: ")
@@ -283,7 +283,8 @@ def anything_else(user_id, businesses, reviews, users):
             valid_choice = True
 
 
-def display_reviews(user, reviews):
+def display_reviews(user):
+    reviews = pd.read_csv("newDFReview.csv")
     print()
     print("[M] - Display all of my reviews")
     print("[U] - Search for reviews by user")
@@ -298,7 +299,7 @@ def display_reviews(user, reviews):
             user_reviews = reviews[reviews["user_id"] == user]
             print(user_reviews)
             print()
-            display_reviews(user, reviews)
+            display_reviews(user)
 
         elif choice.upper() == "U":
             valid_choice = True
@@ -309,13 +310,19 @@ def display_reviews(user, reviews):
                 if chosen_user.upper() != "X":
                     user_reviews = reviews[reviews["user_id"] == chosen_user]
                     if len(user_reviews) == 0:
-                        print("Invalid User ID")
+                        print("Invalid User ID / This user has left no valid reviews (valid reviews must be in valid "
+                              "timeframe)")
                     else:
                         valid_user = True
+                        # user_reviews = user_reviews.set_index("review_id")
                         print(user_reviews)
+                        temp = []
+                        for index, row in user_reviews.iterrows():
+                            temp.append(row["review_id"])
+                        rate_review(temp)
                 else:
                     valid_user = True
-            display_reviews(user, reviews)
+            display_reviews(user)
 
         elif choice.upper() == "B":
             valid_choice = True
@@ -326,13 +333,18 @@ def display_reviews(user, reviews):
                 if chosen_business.upper() != "X":
                     business_reviews = reviews[reviews["business_id"] == chosen_business]
                     if len(business_reviews) == 0:
-                        print("Invalid business ID")
+                        print("Invalid business ID / This business has no valid reviews (must be in valid timeframe)")
                     else:
                         valid_business = True
+                        # business_reviews = business_reviews.set_index("review_id")
                         print(business_reviews)
+                        temp = []
+                        for index, row in business_reviews.iterrows():
+                            temp.append(row["review_id"])
+                        rate_review(temp)
                 else:
                     valid_business = True
-            display_reviews(user, reviews)
+            display_reviews(user)
 
         elif choice.upper() != "X":
             print("INVALID INPUT")
@@ -340,3 +352,83 @@ def display_reviews(user, reviews):
         else:
             valid_choice = True
             print()
+
+
+# Give the user the option to rate a particular review
+def rate_review(reviews):
+    reviews_df = pd.read_csv("newDFReview.csv")
+    users_df = pd.read_csv("newDFUser.csv")
+    print()
+    valid_choice = False
+    giving_rating = False
+    while not valid_choice:
+        yn = input("Would you like to rate any reviews? [Y/N]: ")
+        if yn.upper() == "Y":
+            valid_choice = True
+            giving_rating = True
+        elif yn.upper() != "N":
+            print("INVALID INPUT")
+        else:
+            valid_choice = True
+
+    # Give a menu of rating choices to choose from and update review's and user's dataframes accordingly
+    if giving_rating:
+        valid_review = False
+        while not valid_review:
+            print()
+            chosen_review = input("Please enter a review_id ID (or [X] to exit): ")
+            if chosen_review.upper() != "X":
+                if chosen_review not in reviews:
+                    print("INVALID ID")
+                else:
+                    valid_review = True
+                    print()
+                    print("[U] - Useful")
+                    print("[F] - Funny")
+                    print("[C] - Cool")
+                    print("[B] - Return")
+                    print("[X] - Exit")
+                    valid_choice = False
+                    returning = False
+                    while not valid_choice:
+                        choice = input("Please enter from the selection above: ")
+
+                        if choice.upper() == "U":
+                            valid_choice = True
+                            chosen_stat = "useful"
+
+                        elif choice.upper() == "F":
+                            valid_choice = True
+                            chosen_stat = "funny"
+
+                        elif choice.upper() == "C":
+                            valid_choice = True
+                            chosen_stat = "cool"
+
+                        elif choice.upper() == "B":
+                            valid_choice = True
+                            returning = True
+                            print()
+
+                        elif choice.upper() == "X":
+                            valid_choice = True
+                            exit()
+
+                        else:
+                            print("INVALID INPUT")
+
+                    if not returning:
+                        # Update the review
+                        reviews_df.loc[reviews_df["review_id"] == chosen_review, chosen_stat] += 1
+                        reviews_df.to_csv("newDFReview.csv", index=0)
+
+                        # Update the relevant user
+                        id_search = reviews_df.loc[reviews_df["review_id"] == chosen_review]
+                        complimented_user = id_search['user_id'].iloc[0]
+                        users_df.loc[users_df["user_id"] == complimented_user, chosen_stat] += 1
+                        users_df.to_csv("newDFUser.csv", index=0)
+
+                        print("The review has been rated...")
+
+            else:
+                valid_review = True
