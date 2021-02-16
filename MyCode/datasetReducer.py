@@ -43,7 +43,12 @@ def refine_covid():
 
 # Refine the businesses dataframe by the refined COVID dataframe
 def refine_by_covid():
-    rdf = newDFBusiness[newDFBusiness["business_id"].isin(newDFCovid["business_id"])]
+    # After reading the FAQ, it is requested that the COVID data provides additional information but does not reduce
+    #   the main data, if it were to be reduced, then the line below should be used instead
+
+    # rdf = newDFBusiness[newDFBusiness["business_id"].isin(newDFCovid["business_id"])]
+
+    rdf = newDFBusiness
     return rdf
 
 
