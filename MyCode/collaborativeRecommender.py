@@ -39,9 +39,6 @@ def collaborative_recommender(user_id):
     weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, businesses_df, users_df,
                                         reviews_df, refined_businesses)
 
-    # # Refine the businesses based on preferences
-    # refined_businesses = remove_businesses(weighted_average, user_id, users_df, reviews_df, businesses_df, blacklist)
-
     # Return recommender predictions
     return weighted_average, refined_businesses
 
@@ -77,6 +74,8 @@ def make_comparable(items_row):
     comparable = []
 
     # remove any cell which is not a numeric type
+    # This leaves the remaining cells:
+    #   latitude, longitude, stars, review_count, is_open
     for item in items_row:
         if type(item) in [float, int] and not math.isnan(item):
             comparable.append(item)

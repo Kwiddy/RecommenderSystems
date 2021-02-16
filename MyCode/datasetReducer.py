@@ -5,8 +5,8 @@ import json
 
 # Load the datasets into a pandas dataframe
 def load_dataset(path):
-    with open(path, encoding="utf-8") as f:
-        for count, line in enumerate(f):
+    with open(path, encoding="utf-8") as file:
+        for count, line in enumerate(file):
             data = json.loads(line.strip())
             if count == 0:
                 dataset = {}
@@ -15,7 +15,8 @@ def load_dataset(path):
                     dataset[k] = []
             for k in keys:
                 dataset[k].append(data[k])
-    return pd.DataFrame(dataset)
+    new_df = pd.DataFrame(dataset)
+    return new_df
 
 
 # Refine the business dataframe by city and category
@@ -59,7 +60,7 @@ def refine_users():
     # Add a column for minimum number of stars
     rdf["min_stars"] = 1
 
-    # Add a column for preference of recommending already reviewed businesses (default Yes)
+    # Add a column for preference of recommending already reviewed businesses (default No (do not recommend seen items))
     rdf["recommend_seen"] = "Y"
 
     # Add a column, later to contain a string-dictionary, where further preferences are contained such as requiring

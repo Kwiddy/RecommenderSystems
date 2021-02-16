@@ -1,10 +1,13 @@
 # This recommender uses content-based filtering
 
+# imports
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 
 def content_based_recommender(reviewed_items, refined_businesses):
+    refined_businesses = pd.read_csv("newDFBusiness.csv")
     similarity_measure = refined_businesses['categories']
     # TF-IDF algorithm, weights the importance of keywords based on frequency, higher weight = rarer and more important
     # TF = Term frequency, IDF = Inverse document frequency (relative significance)
@@ -19,7 +22,8 @@ def content_based_recommender(reviewed_items, refined_businesses):
     cosine_similarities = linear_kernel(tfidf_matrix, tfidf_matrix)
     results = {}
     for index, row in refined_businesses.iterrows():
-        similar_indices = cosine_similarities[index].argsort()[:-100:-1]
+        # similar_indices = cosine_similarities[index].argsort()[:-500:-1]
+        similar_indices = cosine_similarities[index].argsort()
         similar_items = [[cosine_similarities[index][i], refined_businesses['business_id'][i]] for i in similar_indices]
         results[row['business_id']] = similar_items[1:]
 
@@ -28,7 +32,6 @@ def content_based_recommender(reviewed_items, refined_businesses):
     for business_id in reviewed_items:
         if len(combined_results) == 0:
             combined_results = results[business_id]
-            print(combined_results)
         else:
             for result in results[business_id]:
                 i = 0
