@@ -184,7 +184,12 @@ def display_results(user, results, businesses_df, return_num, no_reviews, covid_
             result = result.set_index("Result Rank")
 
             # Add prediction
-            result["Prediction"] = item[0]
+            limited_prediction = item[0]
+            if limited_prediction > 100:
+                limited_prediction = 100
+            elif limited_prediction < 0:
+                limited_prediction = 0
+            result["Prediction"] = str(round(limited_prediction, 2)) + "%"
 
             # Add the item to the output
             if first:
