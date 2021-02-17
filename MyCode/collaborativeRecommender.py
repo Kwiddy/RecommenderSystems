@@ -90,9 +90,14 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     n_final_similarities = []
     d_final_similarities = []
     reviewed_stars = []
-    for item in rated["business_id"]:
 
+    for item in rated["business_id"]:
         reviewed_id = item
+
+        # Find the average rating of the business
+        id_search = businesses_df[businesses_df["business_id"] == reviewed_id]
+        a_avg_rating = id_search['stars'].iloc[0]
+
         rated_item = rated.loc[rated["business_id"] == reviewed_id]
         reviewed_stars.append(int(rated_item["stars"]))
 
@@ -155,9 +160,31 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         d = denominators[i][0]
 
         # Round the result to 2dp for reasons explained in the report
-        result = round(n/d, 2)
+        result = n/d
 
         predictions.append([result, numerators[i][1]])
+
+    # My novel results normalizing function
+    # Normalized prediction = average business score + (prediction - average user score)
+    # Results are all sorted, cascaded, and ready to be outputted, and then only at the end are values above 100 or
+    # below 0 increased/reduced to equal 100 or 0
+    i = 0
+    while i < len(predictions):
+        id_search = businesses_df[businesses_df["business_id"] == predictions[i][1]]
+        avg_bus_score = id_search['stars'].iloc[0]
+        id_search = users_df[users_df["user_id"] == user]
+        avg_user_score = id_search['average_stars'].iloc[0]
+        current_pred = predictions[i][0]
+        predictions[i][0] = avg_bus_score + (avg_user_score - current_pred)
+
+        # Convert prediction to a value between 0 and 100 (apart from exceptions which are handled later as described
+        #   above)
+        predictions[i][0] *= 20
+
+        # Round all predictions to the nearest 2dp
+        predictions[i][0] = round(predictions[i][0], 2)
+
+        i += 1
 
     # Sort the predictions
     sorted_predictions = sorted(predictions, reverse=True)

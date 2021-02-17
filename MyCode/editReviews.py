@@ -59,81 +59,85 @@ def add_new_review(user_id, reviews, businesses, users):
 
     valid_input = False
     while not valid_input:
-        print("Please enter the id or name of the business:")
-        review_business_input = input()
-        id_search = businesses[businesses["business_id"] == review_business_input]
-        name_search = businesses[businesses["name"] == review_business_input]
-        if len(id_search) != 0:
-            review_business_id = id_search['business_id'].iloc[0]
-            print("Chosen Business: ", str(id_search['name'].iloc[0]))
-            valid_input = True
-        elif len(name_search) != 0:
-            review_business_id = name_search['business_id'].iloc[0]
-            print("Chosen Business: ", str(name_search['name'].iloc[0]))
-            valid_input = True
+        review_business_input = input("Please enter the id or name of the business (or [C] to cancel): ")
+        if review_business_input.upper() != "C":
+            id_search = businesses[businesses["business_id"] == review_business_input]
+            name_search = businesses[businesses["name"] == review_business_input]
+            if len(id_search) != 0:
+                review_business_id = id_search['business_id'].iloc[0]
+                print("Chosen Business: ", str(id_search['name'].iloc[0]))
+                valid_input = True
+            elif len(name_search) != 0:
+                review_business_id = name_search['business_id'].iloc[0]
+                print("Chosen Business: ", str(name_search['name'].iloc[0]))
+                valid_input = True
+            else:
+                print("INVALID NAME OR BUSINESS")
         else:
-            print("INVALID NAME OR BUSINESS")
+            valid_input = True
     print()
 
-    # Detect if the user has already reviewed the chosen business and if so, give them the option to
-    #   edit their review instead
-    # review_business_id
-    user_reviews = reviews[reviews["user_id"] == user_id]
-    prev_reviewed_business = False
-    for index, row in user_reviews.iterrows():
-        if review_business_id == row["business_id"]:
-            prev_reviewed_business = True
-            break
-    if prev_reviewed_business:
-        print("You have already reviewed this business, if you wish, you may instead edit this review in the edit "
-              "section")
-        print()
-    else:
+    if review_business_input.upper() != "C":
 
-        # Take the text of the review
-        valid_input = False
-        while not valid_input:
-            print("Please enter the text of your review: ")
-            review_text = input()
-            if len(review_text) > 0:
-                valid_input = True
-                print()
-            else:
-                print("PLEASE ENTER SOME REVIEW TEXT")
+        # Detect if the user has already reviewed the chosen business and if so, give them the option to
+        #   edit their review instead
+        # review_business_id
+        user_reviews = reviews[reviews["user_id"] == user_id]
+        prev_reviewed_business = False
+        for index, row in user_reviews.iterrows():
+            if review_business_id == row["business_id"]:
+                prev_reviewed_business = True
+                break
+        if prev_reviewed_business:
+            print("You have already reviewed this business, if you wish, you may instead edit this review in the edit "
+                  "section")
+            print()
+        else:
 
-        valid_input = False
-        while not valid_input:
-            print("Please enter the number of stars you wish to rate this business [1-5]: ")
-            review_stars = input()
-            try:
-                if int(review_stars) in range(1, 6):
+            # Take the text of the review
+            valid_input = False
+            while not valid_input:
+                print("Please enter the text of your review: ")
+                review_text = input()
+                if len(review_text) > 0:
                     valid_input = True
                     print()
-                    review_stars = str(int(review_stars)) + ".0"
-            except ValueError as e:
-                print(e)
-                valid_input = False
+                else:
+                    print("PLEASE ENTER SOME REVIEW TEXT")
 
-        # Generate date
-        review_time = str(datetime.datetime.now())[:-7]
+            valid_input = False
+            while not valid_input:
+                print("Please enter the number of stars you wish to rate this business [1-5]: ")
+                review_stars = input()
+                try:
+                    if int(review_stars) in range(1, 6):
+                        valid_input = True
+                        print()
+                        review_stars = str(int(review_stars)) + ".0"
+                except ValueError as e:
+                    print(e)
+                    valid_input = False
 
-        # update reviews dataframe
-        new_review = {'review_id': review_id, 'user_id': user_id, 'business_id': review_business_id, 'stars': review_stars,
-                      'useful': 0, 'funny': 0, 'cool': 0, 'text': review_text, 'date': review_time}
-        reviews = reviews.append(new_review, ignore_index=True)
-        reviews.to_csv("newDFReview.csv", index=0)
+            # Generate date
+            review_time = str(datetime.datetime.now())[:-7]
 
-        # update review count, do I need to update stars?
-        businesses.loc[businesses["business_id"] == review_business_input, "review_count"] += 1
-        businesses.to_csv("newDFBusiness.csv", index=0)
+            # update reviews dataframe
+            new_review = {'review_id': review_id, 'user_id': user_id, 'business_id': review_business_id, 'stars': review_stars,
+                          'useful': 0, 'funny': 0, 'cool': 0, 'text': review_text, 'date': review_time}
+            reviews = reviews.append(new_review, ignore_index=True)
+            reviews.to_csv("newDFReview.csv", index=0)
 
-        # Edit user's number of reviews and average stars
-        users['average_stars'] = np.where(users['user_id'] == user_id, round(((users['average_stars']*users["review_count"])+int(review_stars[:-2]))/(users["review_count"]+1), 2), users['average_stars'])
-        users.loc[users["user_id"] == user_id, "review_count"] += 1
-        users.to_csv("newDFUser.csv", index=0)
+            # update review count, do I need to update stars?
+            businesses.loc[businesses["business_id"] == review_business_input, "review_count"] += 1
+            businesses.to_csv("newDFBusiness.csv", index=0)
 
-        print("Review created with id: ", review_id)
-        print()
+            # Edit user's number of reviews and average stars
+            users['average_stars'] = np.where(users['user_id'] == user_id, round(((users['average_stars']*users["review_count"])+int(review_stars[:-2]))/(users["review_count"]+1), 2), users['average_stars'])
+            users.loc[users["user_id"] == user_id, "review_count"] += 1
+            users.to_csv("newDFUser.csv", index=0)
+
+            print("Review created with id: ", review_id)
+            print()
 
 
 def delete_review(user_id, reviews, businesses, users):
@@ -142,57 +146,60 @@ def delete_review(user_id, reviews, businesses, users):
     print("[A] - Delete all of my reviews")
     valid_choice = False
     while not valid_choice:
-        choice = input("Please select from the options above: ")
-        if choice.upper() == "S":
-            valid_choice = True
-            display_reviews(user_id)
-            valid_choice_2 = False
-            while not valid_choice_2:
-                chosen_id = input("Please enter ID of review to be deleted: ")
-                id_search = reviews[reviews["review_id"] == chosen_id]
-                business_id = id_search['business_id'].iloc[0]
-                if len(id_search) == 0:
-                    print("INVALID ID")
-                else:
-                    valid_choice_2 = True
+        choice = input("Please select from the options above (or [C] to cancel): ")
+        if choice.upper() != "C":
+            if choice.upper() == "S":
+                valid_choice = True
+                display_reviews(user_id)
+                valid_choice_2 = False
+                while not valid_choice_2:
+                    chosen_id = input("Please enter ID of review to be deleted: ")
+                    id_search = reviews[reviews["review_id"] == chosen_id]
+                    business_id = id_search['business_id'].iloc[0]
+                    if len(id_search) == 0:
+                        print("INVALID ID")
+                    else:
+                        valid_choice_2 = True
 
-                    temp = reviews[reviews.review_id == chosen_id]
-                    users['average_stars'] = np.where(users['user_id'] == user_id, round(
-                        ((users['average_stars'] * users["review_count"]) - int(temp["stars"])) / (
-                                    users["review_count"] - 1), 2), users['average_stars'])
-                    temp = []
-
-                    reviews = reviews[reviews.review_id != chosen_id]
-                    businesses.loc[businesses["business_id"] == business_id, "review_count"] -= 1
-                    businesses.to_csv("newDFBusiness.csv", index=0)
-                    users.loc[users["user_id"] == user_id, "review_count"] -= 1
-                    users.to_csv("newDFUser.csv", index=0)
-        elif choice.upper() == "A":
-            sure_valid = False
-            valid_choice = True
-            while not sure_valid:
-                yn = input("Are you sure? [Y/N]: ")
-                if yn.upper() == "Y":
-                    sure_valid = True
-                    temp = reviews[reviews.user_id == user_id]
-                    for index, row in temp.iterrows():
-
+                        temp = reviews[reviews.review_id == chosen_id]
                         users['average_stars'] = np.where(users['user_id'] == user_id, round(
-                            ((users['average_stars'] * users["review_count"]) - int(row["stars"])) / (
-                                    users["review_count"] - 1), 2), users['average_stars'])
+                            ((users['average_stars'] * users["review_count"]) - int(temp["stars"])) / (
+                                        users["review_count"] - 1), 2), users['average_stars'])
+                        temp = []
 
-                        businesses.loc[businesses["business_id"] == row['business_id'], "review_count"] -= 1
+                        reviews = reviews[reviews.review_id != chosen_id]
+                        businesses.loc[businesses["business_id"] == business_id, "review_count"] -= 1
                         businesses.to_csv("newDFBusiness.csv", index=0)
                         users.loc[users["user_id"] == user_id, "review_count"] -= 1
                         users.to_csv("newDFUser.csv", index=0)
-                    reviews = reviews[reviews.user_id != user_id]
-                    temp = []
-                elif yn.upper() == "N":
-                    sure_valid = True
-                else:
-                    print("INVALID INPUT")
+            elif choice.upper() == "A":
+                sure_valid = False
+                valid_choice = True
+                while not sure_valid:
+                    yn = input("Are you sure? [Y/N]: ")
+                    if yn.upper() == "Y":
+                        sure_valid = True
+                        temp = reviews[reviews.user_id == user_id]
+                        for index, row in temp.iterrows():
+
+                            users['average_stars'] = np.where(users['user_id'] == user_id, round(
+                                ((users['average_stars'] * users["review_count"]) - int(row["stars"])) / (
+                                        users["review_count"] - 1), 2), users['average_stars'])
+
+                            businesses.loc[businesses["business_id"] == row['business_id'], "review_count"] -= 1
+                            businesses.to_csv("newDFBusiness.csv", index=0)
+                            users.loc[users["user_id"] == user_id, "review_count"] -= 1
+                            users.to_csv("newDFUser.csv", index=0)
+                        reviews = reviews[reviews.user_id != user_id]
+                        temp = []
+                    elif yn.upper() == "N":
+                        sure_valid = True
+                    else:
+                        print("INVALID INPUT")
+            else:
+                print("INVALID INPUT")
         else:
-            print("INVALID INPUT")
+            valid_choice = True
     reviews.to_csv("newDFReview.csv", index=0)
     print()
 
@@ -217,57 +224,65 @@ def gen_new_review_id(reviews):
 def amend_reviews(user_id, reviews):
     print("--- Your existing reviews ---")
     user_reviews = reviews[reviews["user_id"] == user_id]
-    print(user_reviews)
+    if len(user_reviews) != 0:
+        print(user_reviews)
+    else:
+        print("...You do not currently have any existing reviews")
     print()
     valid_review = False
     while not valid_review:
-        choice = input("Enter the ID of the review you wish to edit: ")
-        review_search = reviews[reviews["review_id"] == choice]
-        if len(review_search) != 0:
+        choice = input("Enter the ID of the review you wish to edit (or [C] to cancel): ")
+        if choice.upper() != "C":
+            review_search = reviews[reviews["review_id"] == choice]
+            if len(review_search) != 0:
+                valid_review = True
+            else:
+                print("INVALID INPUT")
+        else:
             valid_review = True
-        else:
-            print("INVALID INPUT")
-    review_id = choice
 
-    # Editable:
-    #   Stars
-    #   Text
-    print("[S] - Stars given")
-    print("[T] - Review's text")
-    valid_choice = False
-    while not valid_choice:
-        choice = input("Please select from the options above: ")
-        if choice.upper() == "S":
-            valid_choice = True
-            valid_input = False
-            while not valid_input:
-                print("Please enter the number of stars you wish to rate this business [1-5]: ")
-                review_stars = input()
-                try:
-                    if int(review_stars) in range(1, 6):
-                        valid_input = True
-                        review_stars = str(int(review_stars)) + ".0"
-                except ValueError as e:
-                    print(e)
-                    valid_input = False
-            reviews.loc[reviews["review_id"] == review_id, "stars"] = str(review_stars)
-            print("Number of stars given has been changed to: ", review_stars)
-            reviews.to_csv("newDFReview.csv", index=0)
+    if choice.upper() != "C":
+        review_id = choice
 
-        elif choice.upper() == "T":
-            valid_choice = True
-            print("Enter your new review text below:")
-            review_text = input()
-            reviews.loc[reviews["review_id"] == review_id, "text"] = review_text
-            reviews.to_csv("newDFReview.csv", index=0)
-            print("Review text has ben changed")
-        else:
-            print("INVALID INPUT")
+        # Editable:
+        #   Stars
+        #   Text
+        print("[S] - Stars given")
+        print("[T] - Review's text")
+        valid_choice = False
+        while not valid_choice:
+            choice = input("Please select from the options above: ")
+            if choice.upper() == "S":
+                valid_choice = True
+                valid_input = False
+                while not valid_input:
+                    print("Please enter the number of stars you wish to rate this business [1-5]: ")
+                    review_stars = input()
+                    try:
+                        if int(review_stars) in range(1, 6):
+                            valid_input = True
+                            review_stars = str(int(review_stars)) + ".0"
+                    except ValueError as e:
+                        print(e)
+                        valid_input = False
+                reviews.loc[reviews["review_id"] == review_id, "stars"] = str(review_stars)
+                print("Number of stars given has been changed to: ", review_stars)
+                reviews.to_csv("newDFReview.csv", index=0)
 
-        print()
-        print("--- Your existing reviews ---")
-        user_reviews = reviews[reviews["user_id"] == user_id]
-        print(user_reviews)
+            elif choice.upper() == "T":
+                valid_choice = True
+                print("Enter your new review text below:")
+                review_text = input()
+                reviews.loc[reviews["review_id"] == review_id, "text"] = review_text
+                reviews.to_csv("newDFReview.csv", index=0)
+                print("Review text has ben changed")
+            else:
+                print("INVALID INPUT")
+
+            print()
+            print("--- Your existing reviews ---")
+            user_reviews = reviews[reviews["user_id"] == user_id]
+            print(user_reviews)
 
 
 def anything_else(user_id, businesses, reviews, users):
@@ -347,8 +362,6 @@ def display_reviews(user):
                         possible_businesses = businesses[businesses["name"] == chosen_business]
                         if len(possible_businesses) != 0:
 
-
-
                             valid = False
                             while not valid:
                                 print()
@@ -370,7 +383,6 @@ def display_reviews(user):
                                         rate_review(temp)
                                 else:
                                     valid = True
-
 
                         else:
                             print("Invalid business ID / This business has no valid reviews (must be in valid timeframe)")
