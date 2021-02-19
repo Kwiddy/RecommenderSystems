@@ -47,6 +47,10 @@ def find_rmse(users_df, reviews_df):
     fp_c = 0
     tn_c = 0
 
+    # Explainability trackers
+    total_explained = 0
+    total_recommended = 0
+
     # So only compute novelty once
     novelty_done = False
 
@@ -84,12 +88,26 @@ def find_rmse(users_df, reviews_df):
         # Remove any reviews not in to_keep
         rated = rated[rated.review_id.isin(to_keep)]
 
+        ### Novelty Calculation
+        first_recommendations, refined_businesses, explanatory_refs = collaborative_recommender(user)
+
+        copy = []
+        for item in first_recommendations:
+            copy.append(item)
+
+        second_recommendations = content_based_recommender(reviewed_ids, refined_businesses, user)
+
+        # Apply a cascade scheme to join the two recommender systems
+        final_recommendations = cascade_scheme(first_recommendations, second_recommendations)
+        total_explained += len(explanatory_refs)
+        total_recommended += len(final_recommendations)
+
         i = 0
         while i < len(reviewed_ids):
             temp = [x for k, x in enumerate(reviewed_ids) if k != i]
             saved = reviewed_ids[i]
 
-            first_recommendations, refined_businesses = collaborative_recommender(user)
+            first_recommendations, refined_businesses, explanatory_refs = collaborative_recommender(user)
 
             copy = []
             for item in first_recommendations:
@@ -258,5 +276,14 @@ def find_rmse(users_df, reviews_df):
     print("Hybrid novelty: ", novelty_h)
     print("Baseline (CF) novelty: ", novelty_b)
     print("Baseline (CB) novelty: ", novelty_c)
+    print()
+
+    print("-------------")
+    print("Explanability")
+    print("-------------")
+    print("Total items explained: ", total_explained)
+    print("Total items recommended: ", total_recommended)
+    print("Explainability proportion: ", str(total_explained / total_recommended))
 
     print()
+    exit()
