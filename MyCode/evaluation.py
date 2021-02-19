@@ -47,6 +47,9 @@ def find_rmse(users_df, reviews_df):
     fp_c = 0
     tn_c = 0
 
+    # So only compute novelty once
+    novelty_done = False
+
     # For each user
     for user in test_users:
         # Take all reviewed_id's and remove them one at a time
@@ -96,6 +99,33 @@ def find_rmse(users_df, reviews_df):
 
             # Apply a cascade scheme to join the two recommender systems
             final_recommendations = cascade_scheme(first_recommendations, second_recommendations)
+
+            # Novelty
+            #   For each recommendation: SUM(-log of the proportion of users who viewed/rated an item)
+            #   --------------------------------------------------------------------------------------
+            #                            number of recommendations in list
+            if not novelty_done:
+                num_users = len(users_df)
+                # exit()
+                numerator = 0
+                for item in final_recommendations:
+                    business_reviews = reviews_df[reviews_df["business_id"] == item[1]]
+                    if len(business_reviews) != 0:
+                        numerator += -1 * (math.log2(len(business_reviews)/num_users))
+                novelty_h = numerator / len(final_recommendations)
+                numerator = 0
+                for item in first_recommendations:
+                    business_reviews = reviews_df[reviews_df["business_id"] == item[1]]
+                    if len(business_reviews) != 0:
+                        numerator += -1 * (math.log2(len(business_reviews)/num_users))
+                novelty_b = numerator / len(first_recommendations)
+                numerator = 0
+                for item in second_recommendations:
+                    business_reviews = reviews_df[reviews_df["business_id"] == item[1]]
+                    if len(business_reviews) != 0:
+                        numerator += -1 * (math.log2(len(business_reviews)/num_users))
+                novelty_c = numerator / len(second_recommendations)
+                novelty_done = True
 
             # F-Measure
             # 2* ((precision * recall) / (precision + recall))
@@ -206,6 +236,7 @@ def find_rmse(users_df, reviews_df):
     print("-------------")
     print("F1-score")
     print("-------------")
+    print("Total results: " + str(tp_b + tn_b + fn_b + fp_b))
     precision_h = tp_h / (tp_h + fp_h)
     recall_h = tp_h / (tp_h + fn_h)
     f1_score_h = 2*((precision_h*recall_h)/(precision_h + recall_h))
@@ -218,5 +249,14 @@ def find_rmse(users_df, reviews_df):
     recall_c = tp_c / (tp_c + fn_c)
     f1_score_c = 2 * ((precision_c * recall_c) / (precision_c + recall_c))
     print("Baseline (CB) f1-score: "+ str(f1_score_c*100) + "%")
+    print()
+
+    # Calculate the novelty
+    print("-------------")
+    print("Novelty")
+    print("-------------")
+    print("Hybrid novelty: ", novelty_h)
+    print("Baseline (CF) novelty: ", novelty_b)
+    print("Baseline (CB) novelty: ", novelty_c)
 
     print()

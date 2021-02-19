@@ -38,11 +38,11 @@ def collaborative_recommender(user_id):
     rated_items = find_user_rated(user_id, reviews_df)
 
     # Find the predictions for each item and find the items to be recommended
-    weighted_average = find_predictions(similarity_matrix, user_id, rated_items, indices, businesses_df, users_df,
-                                        reviews_df, refined_businesses)
+    weighted_average, explanatory_refs = find_predictions(similarity_matrix, user_id, rated_items, indices,
+                                                          businesses_df, users_df, reviews_df, refined_businesses)
 
     # Return recommender predictions
-    return weighted_average, refined_businesses
+    return weighted_average, refined_businesses, explanatory_refs
 
 
 # Find the similarity matrix between businesses
@@ -90,6 +90,8 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     n_final_similarities = []
     d_final_similarities = []
     reviewed_stars = []
+    explanatory_refs = []
+    explanatory_seen = []
 
     # replace multiple reviews for a single business with one average review
     # print(rated)
@@ -145,7 +147,7 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         #     # print(avg)
         #     # reviewed_stars.append(avg)
         #     #############################
-        reviewed_stars.append(int(rated_item["stars"]))
+        reviewed_stars.append([int(rated_item["stars"]), reviewed_id])
 
         for i in range(len(business_index)):
             if business_index[i] == reviewed_id:
@@ -170,10 +172,25 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
 
     temp = []
     for i in range(len(n_final_similarities)):
-        multiplier = reviewed_stars[i]
+        multiplier = reviewed_stars[i][0]
         temp2 = []
         for j in range(len(n_final_similarities[i])):
             product = multiplier * n_final_similarities[i][j][0]
+            # print(multiplier)
+            # print(n_final_similarities[i][j][0])
+            # print("----")
+
+            sim_ref_item = "-"
+
+            # Find items which have a high similarity to a high user-rated item
+            if multiplier >= 5 and n_final_similarities[i][j][0] >= 0.99 and n_final_similarities[i][j][1] not in \
+                    explanatory_seen:
+                sim_ref_item = reviewed_stars[i][1]
+                explanatory_seen.append(n_final_similarities[i][j][1])
+
+                # If business bearing a strong similarity to highly rated item store [business_id, rated_items_id]
+                explanatory_refs.append([n_final_similarities[i][j][1], sim_ref_item])
+
             new_item = [product, n_final_similarities[i][j][1]]
             temp2.append(new_item)
         temp.append(temp2)
@@ -231,8 +248,8 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         rounded.append([round(new_sorted[i][0], 2), new_sorted[i][1]])
         i += 1
 
-    # Return the list of sorted predictions
-    return rounded
+    # Return the list of sorted predictions as well as the explanations for the strong positive predictions
+    return rounded, explanatory_refs
 
 
 def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, covid_df, blacklist):
