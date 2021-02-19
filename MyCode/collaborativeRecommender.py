@@ -91,6 +91,28 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     d_final_similarities = []
     reviewed_stars = []
 
+    # replace multiple reviews for a single business with one average review
+    # print(rated)
+    seen = []
+    to_keep = []
+    for index, row in rated.iterrows():
+        if row["business_id"] not in seen:
+            seen.append(row["business_id"])
+            to_keep.append(row["review_id"])
+            id_search = rated[rated["business_id"] == row["business_id"]]
+
+            # If a business has been rated multiple times
+            if len(id_search) != 1:
+                avg_list = []
+                for i, r in id_search.iterrows():
+                    avg_list.append(int(r["stars"]))
+                avg = int(round(sum(avg_list) / len(avg_list), 0))
+                rated.loc[index, "stars"] = avg
+
+    # Remove any reviews not in to_keep
+    rated = rated[rated.review_id.isin(to_keep)]
+
+    # For each business id that the user has rated
     for item in rated["business_id"]:
         reviewed_id = item
 
@@ -99,6 +121,30 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         a_avg_rating = id_search['stars'].iloc[0]
 
         rated_item = rated.loc[rated["business_id"] == reviewed_id]
+        # #############################
+        # # avg_score = []
+        # # for index, row in rated_item.iterrows():
+        # #     print(row)
+        # # print()
+        # if reviewed_id not in seen:
+        #     if len(rated_item) > 1:
+        #         print("hi")
+        #         print(rated_item)
+        #         avg_list = []
+        #         for index, row in rated_item.iterrows():
+        #             avg_list.append(int(row["stars"]))
+        #         print(avg_list)
+        #         avg = int(round(sum(avg_list) / len(avg_list), 0))
+        #         print(avg)
+        #         reviewed_stars.append(eval)
+        #     else:
+        #         print(int(rated_item["stars"]))
+        #         reviewed_stars.append(int(rated_item["stars"]))
+        #     # avg = sum(avg_score) / len(avg_score)
+        #     # reviewed_stars.append(int(rated_item["stars"]))
+        #     # print(avg)
+        #     # reviewed_stars.append(avg)
+        #     #############################
         reviewed_stars.append(int(rated_item["stars"]))
 
         for i in range(len(business_index)):
@@ -115,6 +161,8 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         # Append similarities to a list of all similarity scores for each reviewed item
         n_final_similarities.append(sims_id)
         d_final_similarities.append(sims_id)
+
+        seen.append(reviewed_id)
 
     # reviewed_item = item in reviewed
     # reviewed_stars = user rating
@@ -164,31 +212,11 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
 
         predictions.append([result, numerators[i][1]])
 
-    # My novel results normalizing function
-    # Normalized prediction = average business score + (prediction - average user score)
-    # Results are all sorted, cascaded, and ready to be outputted, and then only at the end are values above 100 or
-    # below 0 increased/reduced to equal 100 or 0
-    i = 0
-    while i < len(predictions):
-        id_search = businesses_df[businesses_df["business_id"] == predictions[i][1]]
-        avg_bus_score = id_search['stars'].iloc[0]
-        id_search = users_df[users_df["user_id"] == user]
-        avg_user_score = id_search['average_stars'].iloc[0]
-        current_pred = predictions[i][0]
-        predictions[i][0] = avg_bus_score + (avg_user_score - current_pred)
-
-        # Convert prediction to a value between 0 and 100 (apart from exceptions which are handled later as described
-        #   above)
-        predictions[i][0] *= 20
-
-        # Round all predictions to the nearest 2dp
-        predictions[i][0] = round(predictions[i][0], 2)
-
-        i += 1
-
-    # Sort the predictions
+    # Sort and round the predictions
     sorted_predictions = sorted(predictions, reverse=True)
 
+    # print(sorted_predictions)
+    # print("-")
     # Refine the predictions by the accepted businesses
     new_sorted = []
     for prediction in sorted_predictions:
@@ -196,8 +224,15 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         if len(id_search) == 1:
             new_sorted.append(prediction)
 
+    # Round the list
+    rounded = []
+    i = 0
+    while i < len(new_sorted):
+        rounded.append([round(new_sorted[i][0], 2), new_sorted[i][1]])
+        i += 1
+
     # Return the list of sorted predictions
-    return new_sorted
+    return rounded
 
 
 def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, covid_df, blacklist):

@@ -1,5 +1,6 @@
 # imports
 from editReviews import *
+from evaluation import *
 from dataExplanation import *
 from updatePreferences import *
 from hybridRecommender import *
@@ -29,8 +30,15 @@ def select_user(user_df):
     while not valid_choice:
         input_own_choice = input("Please select from the options above: ")
 
+        # hidden evaluation mode
+        if input_own_choice.upper() == "--EVAL":
+            print("Evalutaing system...")
+            users_df = pd.read_csv("newDFUser.csv")
+            reviews_df = pd.read_csv("newDFReview.csv")
+            find_rmse(users_df, reviews_df)
+
         # Display a selection of pre-chosen user IDs
-        if input_own_choice.upper() == "S":
+        elif input_own_choice.upper() == "S":
             print()
             valid_choice = True
             print("[A] - fkLVpxbHNmeqgIl7O4GztA (Reviews: 6)")
@@ -208,7 +216,7 @@ def main(new_user, existing_user):
 
     # Allow user to choose their service
     print("[G] - Generate list of recommendations")
-    print("[R] - Add/Amend/View/Delete a Review")
+    print("[R] - Add/Amend/View/Rank/Delete a Review")
     print("[P] - Update user preferences")
     print("[L] - Logout and enter another User ID")
     print("[H] - How we use your data")
@@ -219,7 +227,7 @@ def main(new_user, existing_user):
     while not valid_choice:
         choice = input("Please choose from the services listed above: ")
 
-        # Generate a list of recommendations
+        # Generate a list of recommendations in evaluation mode
         if choice.upper() == "G":
             valid_choice = True
             print()
