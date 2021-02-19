@@ -313,7 +313,10 @@ def display_reviews(user):
         if choice.upper() == "M":
             valid_choice = True
             user_reviews = reviews[reviews["user_id"] == user]
-            print(user_reviews)
+            user_reviews["business name"] = user_reviews.apply\
+                (lambda row: businesses[businesses["business_id"] == row.business_id]["name"].iloc[0], axis=1)
+            print(user_reviews[["review_id", "user_id", "business_id", "business name", "stars", "useful",
+                                "funny", "cool", "text", "date"]])
             print()
             display_reviews(user)
 
@@ -331,7 +334,11 @@ def display_reviews(user):
                     else:
                         valid_user = True
                         # user_reviews = user_reviews.set_index("review_id")
-                        print(user_reviews)
+                        user_reviews["business name"] = user_reviews.apply(
+                            lambda row: businesses[businesses["business_id"] == row.business_id]["name"].iloc[0],
+                            axis=1)
+                        print(user_reviews[["review_id", "user_id", "business_id", "business name", "stars", "useful",
+                                            "funny", "cool", "text", "date"]])
                         temp = []
                         for index, row in user_reviews.iterrows():
                             temp.append(row["review_id"])
@@ -352,7 +359,11 @@ def display_reviews(user):
                     if len(business_reviews) != 0:
                         valid_business = True
                         # business_reviews = business_reviews.set_index("review_id")
-                        print(business_reviews)
+                        business_reviews["business name"] = business_reviews.apply(
+                            lambda row: businesses[businesses["business_id"] == row.business_id]["name"].iloc[0],
+                            axis=1)
+                        print(business_reviews[["review_id", "user_id", "business_id", "business name", "stars", "useful",
+                                            "funny", "cool", "text", "date"]])
                         temp = []
                         for index, row in business_reviews.iterrows():
                             temp.append(row["review_id"])
@@ -366,7 +377,7 @@ def display_reviews(user):
                             while not valid:
                                 print()
                                 print(possible_businesses)
-                                chosen_business = input("Please enter one of the IDs above (or [X] to exit): ")
+                                chosen_business = input("Please enter one of the Business IDs above (or [X] to exit): ")
                                 if chosen_business.upper() != "X":
                                     business_reviews = reviews[reviews["business_id"] == chosen_business]
                                     if len(business_reviews) == 0:
@@ -376,7 +387,14 @@ def display_reviews(user):
                                     else:
                                         valid = True
                                         # user_reviews = user_reviews.set_index("review_id")
-                                        print(business_reviews)
+                                        business_reviews["business name"] = business_reviews.apply(
+                                            lambda row:
+                                            businesses[businesses["business_id"] == row.business_id]["name"].iloc[0],
+                                            axis=1)
+                                        print(business_reviews[
+                                                  ["review_id", "user_id", "business_id", "business name", "stars",
+                                                   "useful",
+                                                   "funny", "cool", "text", "date"]])
                                         temp = []
                                         for index, row in business_reviews.iterrows():
                                             temp.append(row["review_id"])
