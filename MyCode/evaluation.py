@@ -7,8 +7,10 @@ from hybridRecommender import *
 pd.options.mode.chained_assignment = None  # default='warn'
 
 
-# Find the RMSE of the system
-def find_rmse(users_df, reviews_df):
+# Find the metrics of the system
+def find_metrics(users_df, reviews_df):
+
+    user_review_limit = 3
 
     # Known size of the test set
     total_known = 0
@@ -24,7 +26,7 @@ def find_rmse(users_df, reviews_df):
             if r["business_id"] not in seen:
                 seen.append(r["business_id"])
                 count += 1
-        if count > 3:
+        if count > user_review_limit:
             test_users.append(u_id)
             total_known += count
 

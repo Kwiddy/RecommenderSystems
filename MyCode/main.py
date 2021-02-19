@@ -35,7 +35,7 @@ def select_user(user_df):
             print("Evalutaing system...")
             users_df = pd.read_csv("newDFUser.csv")
             reviews_df = pd.read_csv("newDFReview.csv")
-            find_rmse(users_df, reviews_df)
+            find_metrics(users_df, reviews_df)
 
         # Display a selection of pre-chosen user IDs
         elif input_own_choice.upper() == "S":
