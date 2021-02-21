@@ -1,6 +1,4 @@
 # imports
-import pandas as pd
-import math
 from hybridRecommender import *
 
 # stop copying error from appearing

@@ -6,6 +6,7 @@ from ast import literal_eval
 
 # Update user preferences
 def update_preferences(user_id, users_df, businesses_df):
+
     # Display preferences menu and repeat request until a valid input is given
     print("[N] - Change number of recommendations displayed")
     print("[S] - Choose a minimum number of stars for recommendations")
