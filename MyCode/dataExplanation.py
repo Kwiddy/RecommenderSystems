@@ -4,9 +4,11 @@ def show_data_explanation():
     print("HOW THE SYSTEM USES YOUR DATA")
     print("This system uses a combination of recommender systems (Collaborative and Content-based) with a cascade "
           "scheme to generate your recommendations. In order to find the suitability of each Sports Bar for you "
-          "your pass reviews and ratings are taken into account, along with any preferences which you may have "
-          "expressed. The majority of the data is editable to you and so you can edit and improve the data used "
-          "to recommend businesses as you please. More details on this can be found below.")
+          "your past reviews and ratings are taken into account, along with any preferences which you may have "
+          "expressed. The system only uses your explicit data, for example, nothing is implied from the text left"
+          "on your reviews or on any tips you may leave. The majority of the data is editable to you and "
+          "so you can edit and improve the data used to recommend businesses as you please. More details on this "
+          "can be found below.")
     print()
 
     print("YOUR REVIEWS")
