@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 
 
+# Weaker secondary content-based recommender
 def content_based_recommender(reviewed_items, refined_businesses, user):
     refined_businesses = pd.read_csv("newDFBusiness.csv")
     similarity_measure = refined_businesses['categories']
@@ -22,7 +23,6 @@ def content_based_recommender(reviewed_items, refined_businesses, user):
     cosine_similarities = linear_kernel(tfidf_matrix, tfidf_matrix)
     results = {}
     for index, row in refined_businesses.iterrows():
-        # similar_indices = cosine_similarities[index].argsort()[:-500:-1]
         similar_indices = cosine_similarities[index].argsort()
         similar_items = [[cosine_similarities[index][i], refined_businesses['business_id'][i]] for i in similar_indices]
         results[row['business_id']] = similar_items[1:]
@@ -41,7 +41,6 @@ def content_based_recommender(reviewed_items, refined_businesses, user):
             for result in results[business_id]:
                 to_add = [result[0] * ratings[business_id], result[1]]
                 combined_results.append(to_add)
-            # combined_results = results[business_id]
         else:
             for result in results[business_id]:
                 i = 0

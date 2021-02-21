@@ -69,8 +69,8 @@ def generate_recommendations(user_id, users_df):
             current_pred = final_recommendations[i][0]
             final_recommendations[i][0] = avg_bus_score + (avg_user_score - current_pred)
 
-            # Convert prediction to a value between 0 and 100 (apart from exceptions which are handled later as described
-            #   above)
+            # Convert prediction to a value between 0 and 100 (apart from exceptions which are handled later as
+            # described above)
             final_recommendations[i][0] *= 20
 
             # Round all predictions to the nearest 2dp

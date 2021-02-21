@@ -250,7 +250,6 @@ def advanced_options(user, users_df, businesses_df):
             delete_preference(user, users_df, preferences)
             anything_else(user, users_df, businesses_df)
 
-
         # Detect invalid inputs or a wish to close the program
         elif choice.upper() != "B":
             if choice.upper() == "X":

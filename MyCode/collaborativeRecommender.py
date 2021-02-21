@@ -123,30 +123,6 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         a_avg_rating = id_search['stars'].iloc[0]
 
         rated_item = rated.loc[rated["business_id"] == reviewed_id]
-        # #############################
-        # # avg_score = []
-        # # for index, row in rated_item.iterrows():
-        # #     print(row)
-        # # print()
-        # if reviewed_id not in seen:
-        #     if len(rated_item) > 1:
-        #         print("hi")
-        #         print(rated_item)
-        #         avg_list = []
-        #         for index, row in rated_item.iterrows():
-        #             avg_list.append(int(row["stars"]))
-        #         print(avg_list)
-        #         avg = int(round(sum(avg_list) / len(avg_list), 0))
-        #         print(avg)
-        #         reviewed_stars.append(eval)
-        #     else:
-        #         print(int(rated_item["stars"]))
-        #         reviewed_stars.append(int(rated_item["stars"]))
-        #     # avg = sum(avg_score) / len(avg_score)
-        #     # reviewed_stars.append(int(rated_item["stars"]))
-        #     # print(avg)
-        #     # reviewed_stars.append(avg)
-        #     #############################
         reviewed_stars.append([int(rated_item["stars"]), reviewed_id])
 
         for i in range(len(business_index)):
@@ -176,9 +152,6 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
         temp2 = []
         for j in range(len(n_final_similarities[i])):
             product = multiplier * n_final_similarities[i][j][0]
-            # print(multiplier)
-            # print(n_final_similarities[i][j][0])
-            # print("----")
 
             sim_ref_item = "-"
 
@@ -232,8 +205,6 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
     # Sort and round the predictions
     sorted_predictions = sorted(predictions, reverse=True)
 
-    # print(sorted_predictions)
-    # print("-")
     # Refine the predictions by the accepted businesses
     new_sorted = []
     for prediction in sorted_predictions:
