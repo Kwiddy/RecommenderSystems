@@ -254,19 +254,25 @@ def find_predictions(matrix, user, rated, business_index, businesses_df, users_d
 
 def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, covid_df, blacklist):
     # remove blacklisted items
-    for item in business_ids:
-        if item in blacklist:
-            business_ids.remove(item)
+    i = 0
+    while i < len(business_ids):
+        if business_ids[i] in blacklist:
+            del business_ids[i]
+        else:
+            i += 1
 
     # remove items with a below minimum number of stars (from preferences)
     id_search = users_df[users_df["user_id"] == user]
     min_stars = id_search['min_stars'].iloc[0]
-    for item in business_ids:
-        business_search = businesses_df[businesses_df["business_id"] == item]
+    i = 0
+    while i < len(business_ids):
+        business_search = businesses_df[businesses_df["business_id"] == business_ids[i]]
         num_stars = business_search['stars'].iloc[0]
         num_stars = int(num_stars)
         if num_stars < int(min_stars):
-            business_ids.remove(item)
+            del business_ids[i]
+        else:
+            i += 1
 
     # If the user has chosen not to recommend items which are temporarily closed due to covid
     item_search = id_search['covid_temp_closed'].iloc[0]
@@ -280,7 +286,7 @@ def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, c
             else:
                 i += 1
 
-    # If the user has chosen to only recommen businesses which offer delivery or takeout during covid
+    # If the user has chosen to only recommended businesses which offer delivery or takeout during covid
     item_search = id_search['covid_d_t'].iloc[0]
     if item_search == "Y":
         i = 0
@@ -299,16 +305,21 @@ def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, c
         user_reviews = reviews_df[reviews_df["user_id"] == user]
         for index, row in user_reviews.iterrows():
             to_remove.append(row["business_id"])
-        for item in business_ids:
-            if item in to_remove:
-                business_ids.remove(item)
+        i = 0
+        while i < len(business_ids):
+            if business_ids[i] in to_remove:
+                business_ids.remove(business_ids[i])
+            else:
+                i += 1
 
     # Remove items based on the user's advanced preferences
     advanced_preferences = id_search['advanced_preferences'].iloc[0]
     try:
         advanced_preferences = literal_eval(advanced_preferences)
-        for item in business_ids:
-            business_search = businesses_df[businesses_df["business_id"] == item]
+        i = 0
+        while i < len(business_ids):
+            removed_item = False
+            business_search = businesses_df[businesses_df["business_id"] == business_ids[i]]
             attributes = business_search['attributes'].iloc[0]
 
             # Leave the businesses with nan values as their attributes
@@ -322,8 +333,11 @@ def remove_businesses(business_ids, user, users_df, reviews_df, businesses_df, c
                 for preference in advanced_preferences:
                     if preference in attributes:
                         if attributes[preference] != advanced_preferences[preference]:
-                            business_ids.remove(item)
+                            business_ids.remove(business_ids[i])
+                            removed_item = True
                             break
+            if not removed_item:
+                i += 1
     except:
         pass
 

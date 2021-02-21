@@ -315,7 +315,7 @@ def display_reviews(user):
             user_reviews = reviews[reviews["user_id"] == user]
             user_reviews["business name"] = user_reviews.apply\
                 (lambda row: businesses[businesses["business_id"] == row.business_id]["name"].iloc[0], axis=1)
-            print(user_reviews[["review_id", "user_id", "business_id", "business name", "stars", "useful",
+            print(user_reviews[["review_id", "user_id", "business name", "stars", "useful",
                                 "funny", "cool", "text", "date"]])
             print()
             display_reviews(user)
@@ -337,7 +337,7 @@ def display_reviews(user):
                         user_reviews["business name"] = user_reviews.apply(
                             lambda row: businesses[businesses["business_id"] == row.business_id]["name"].iloc[0],
                             axis=1)
-                        print(user_reviews[["review_id", "user_id", "business_id", "business name", "stars", "useful",
+                        print(user_reviews[["review_id", "user_id", "business name", "stars", "useful",
                                             "funny", "cool", "text", "date"]])
                         temp = []
                         for index, row in user_reviews.iterrows():
@@ -362,7 +362,7 @@ def display_reviews(user):
                         business_reviews["business name"] = business_reviews.apply(
                             lambda row: businesses[businesses["business_id"] == row.business_id]["name"].iloc[0],
                             axis=1)
-                        print(business_reviews[["review_id", "user_id", "business_id", "business name", "stars", "useful",
+                        print(business_reviews[["review_id", "user_id", "business name", "stars", "useful",
                                             "funny", "cool", "text", "date"]])
                         temp = []
                         for index, row in business_reviews.iterrows():
@@ -392,7 +392,7 @@ def display_reviews(user):
                                             businesses[businesses["business_id"] == row.business_id]["name"].iloc[0],
                                             axis=1)
                                         print(business_reviews[
-                                                  ["review_id", "user_id", "business_id", "business name", "stars",
+                                                  ["review_id", "user_id", "business name", "stars",
                                                    "useful",
                                                    "funny", "cool", "text", "date"]])
                                         temp = []

@@ -56,8 +56,15 @@ def find_metrics(users_df, reviews_df):
     # So only compute novelty once
     novelty_done = False
 
+    # Progress updating
+    counter = 0
+
     # For each user
     for user in test_users:
+        # Update progress
+        counter += 1
+        print("Evaluating user: " + str(counter) + "/" + str(len(test_users)))
+
         # Take all reviewed_id's and remove them one at a time
         # Generate Content-Based recommendations using previous reviews
         reviewed_ids = []
@@ -90,7 +97,6 @@ def find_metrics(users_df, reviews_df):
         # Remove any reviews not in to_keep
         rated = rated[rated.review_id.isin(to_keep)]
 
-        ### Novelty Calculation
         first_recommendations, refined_businesses, explanatory_refs = collaborative_recommender(user)
 
         copy = []
@@ -128,23 +134,29 @@ def find_metrics(users_df, reviews_df):
                 num_users = len(users_df)
                 # exit()
                 numerator = 0
+                valid_count_h = 0
                 for item in final_recommendations:
                     business_reviews = reviews_df[reviews_df["business_id"] == item[1]]
                     if len(business_reviews) != 0:
                         numerator += -1 * (math.log2(len(business_reviews)/num_users))
-                novelty_h = numerator / len(final_recommendations)
+                        valid_count_h += 1
+                novelty_h = numerator / valid_count_h
                 numerator = 0
+                valid_count_b = 0
                 for item in first_recommendations:
                     business_reviews = reviews_df[reviews_df["business_id"] == item[1]]
                     if len(business_reviews) != 0:
                         numerator += -1 * (math.log2(len(business_reviews)/num_users))
-                novelty_b = numerator / len(first_recommendations)
+                        valid_count_b += 1
+                novelty_b = numerator / valid_count_b
                 numerator = 0
+                valid_count_c = 0
                 for item in second_recommendations:
                     business_reviews = reviews_df[reviews_df["business_id"] == item[1]]
                     if len(business_reviews) != 0:
                         numerator += -1 * (math.log2(len(business_reviews)/num_users))
-                novelty_c = numerator / len(second_recommendations)
+                        valid_count_c += 1
+                novelty_c = numerator / valid_count_c
                 novelty_done = True
 
             # F-Measure

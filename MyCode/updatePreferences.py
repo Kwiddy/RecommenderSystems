@@ -168,6 +168,7 @@ def update_covid_pref(user, users_df):
             valid_choice = True
     print()
 
+
 # Preference: Define if they wish to have items recommended which they've already reviewed
 def update_review_seen(user, users_df):
     # Find the current preference (default: Yes (Yes, they do wish reviewed items to be recommended))
@@ -425,10 +426,10 @@ def update_min_stars(user, users_df):
     #   Must be an integer. The user can also cancel and return to the menu if wished
     valid_input = False
     while not valid_input:
-        choice = input("Enter a minimum number of stars for recommendations [1-5, or [C] to cancel] (Current: " + str(min_stars) + "): ")
+        choice = input("Enter a minimum number of stars for recommendations [1-4, or [C] to cancel] (Current: " + str(min_stars) + "): ")
         if choice.upper() != "C":
             try:
-                if int(choice) in range(1, 6):
+                if int(choice) in range(1, 5):
                     valid_input = True
                     temp = int(choice)
             except ValueError:

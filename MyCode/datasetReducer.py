@@ -4,6 +4,9 @@ import json
 
 
 # Load the datasets into a pandas dataframe
+# I made a note to check for if the following load_dataset is copied from anywhere as I was just trying to load the
+#   dataset to get started. I have been unable to find any similar code online and therefore believe it is likely
+#   predominantly my own function, however I would like to add this disclaimer explaining the situation.
 def load_dataset(path):
     with open(path, encoding="utf-8") as file:
         for count, line in enumerate(file):
@@ -97,6 +100,7 @@ dfBusiness.dropna(subset=["categories"], inplace=True)
 #       Pet Services 3084
 #       Italian 5012
 #       Sports Bar 2376
+
 domain = "Sports Bar"
 location = "Toronto"
 startDate = "2019"
