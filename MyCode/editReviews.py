@@ -6,6 +6,12 @@ import pandas as pd
 import numpy as np
 
 
+# NOTE
+# I do not update stars when adding/editing/deleting a review, this is because the stars of a business are only to
+# the nearest half star. I could in theory change the average rating based on the changed review, but it would have
+# to act upon to the nearest half star, which would likely remain constant, be saved to the nearest half star, and
+# so would never get changed.
+
 # Present user with menu for editing their reviews
 def edit_reviews(user_id, businesses, reviews, users):
     # Display current reviews
